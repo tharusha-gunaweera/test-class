@@ -4,13 +4,15 @@ import StudentDashboard from "./Components/Students/StudentDashboard";
 import StudentNav from "./Components/Students/Navbar";
 import ChatBox from "./Components/Students/ChatBox";
 import MyClasses from "./Components/Students/MyClasses";
-import TeacherDashboard from "./Components/Teacher/TeacherDashBoard";
+import TeacherDashboard from "./Components/Teacher/TeachersDashboard";
+import TeacherNav from "./Components/Teacher/Navbar";
 import AdminDashboard from "./Components/Admin/AdminDashboard";
 // import TeacherDashboard from "./Components/Teacher/TeacherDashBoard";
 // import TeacherChatBox from "./Components/Students/ChatBox";
 // import TeacherMyClasses from "./Components/Students/MyClasses";
 import Login from './Components/Students/Auth/login';
 import Signup from './Components/Students/Auth/Signup';
+import LandingPage from './Components/LandingPage';
 
 
 
@@ -21,7 +23,9 @@ function App() {
         <div className="flex-grow">
           <Routes>
 
-            <Route path="/" element={<Login />} />
+          <Route path="/" element={<LandingPage />} />
+
+            <Route path="/Login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
 
             <Route path="/Dashboard" element={<StudentDashboard />} />

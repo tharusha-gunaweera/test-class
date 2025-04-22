@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import {
   HomeIcon,
   ChatIcon,
@@ -6,7 +6,20 @@ import {
 } from "@heroicons/react/outline";
 import logo from "../Logo/LogoV2.jpg";
 
+
+
+
 const Navbar = () => {
+
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    navigate('/'); 
+  };
+
+  
   return (
     <div className="fixed left-0 top-0 h-full w-[270px] bg-gray-100 shadow-lg flex flex-col items-center py-6 space-y-20">
       <div className="mb-6">
@@ -15,7 +28,7 @@ const Navbar = () => {
 
       <div className="flex flex-col justify-center items-center space-y-1">
         <NavLink
-          to="/"
+          to="/TeacherDashboard"
           className="w-[300px] flex justify-center items-center gap-3 px-6 py-3 text-sm font-medium font-[Poppins] text-gray-500 hover:text-blue-500"
         >
           {({ isActive }) => (
@@ -70,6 +83,8 @@ const Navbar = () => {
       <div
         to="/logout" 
         className="w-[250px] flex items-center gap-3 cursor-pointer px-6 py-2 text-sm font-medium font-[Poppins] transition-all text-gray-500 hover:text-red-500 hover:bg-red-100"
+
+        onClick={handleLogout}
       >
         <span className="flex items-center justify-center gap-3 px-10 py-1 w-60">
           Log Out

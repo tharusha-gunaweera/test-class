@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { Link, useNavigate } from 'react-router-dom';
 import Lottie from "lottie-react";
 import animationData from "../../Animations/loginAnimation.json"; 
@@ -11,6 +11,40 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
+
+
+
+  useEffect(() => {
+    const userData = localStorage.getItem('user');
+    const token = localStorage.getItem('token');
+  
+    if (userData && token) {
+      try {
+        const user = JSON.parse(userData);
+        const role = user.acclevel;
+  
+        switch (role) {
+          case 1: // Student
+            navigate('/Dashboard');
+            break;
+          case 2: // Teacher
+            navigate('/TeacherDashboard');
+            break;
+          case 3: // Admin
+            navigate('/admin');
+            break;
+          default:
+            navigate('/');
+        }
+      } catch (error) {
+        console.error('Failed to parse user data:', error);
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+      }
+    }
+  }, [navigate]);
+
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -81,18 +115,8 @@ const Login = () => {
         }),
       });
 
-      if (!response.ok) {
-        throw new Error(responseData || 'Login failed. Please check your credentials.');
-      }
 
-      navigate('/Dashboard');
-      return;
-
-    }
-
-      console.log('Student/teacher login response status:', response.status);
       const responseData = await response.text();
-      console.log('Student/teacher login response:', responseData);
 
       if (!response.ok) {
         throw new Error(responseData || 'Login failed. Please check your credentials.');
@@ -101,6 +125,19 @@ const Login = () => {
       const data = JSON.parse(responseData);
       localStorage.setItem('user', JSON.stringify(data.user));
       localStorage.setItem('token', data.token);
+
+      navigate('/Dashboard');
+      return;
+
+    }
+
+      console.log('Student/teacher login response status:', response.status);
+      
+      console.log('Student/teacher login response:', responseData);
+
+      
+
+      
 
       console.log("incomming acc level: " , data.user.acclevel);
 

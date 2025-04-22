@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { FiEdit, FiTrash2, FiSearch, FiPlus } from 'react-icons/fi';
 import axios from "axios";
-// import EditForm from './EditForm';
-// import AddMcqForm from './AddMcqForm';
+import Navbar from "./Navbar";
+import EditForm from './EditForm';
+import AddMcqForm from './AddMcqForm';
 
 const API_URL = "http://localhost:5000/Mcqs";
 
@@ -83,8 +84,9 @@ function DashBoard() {
   );
 
   return (
-    <div className="ml-64 p-6 min-h-screen bg-gray-100">
-      <div className="max-w-7xl mx-auto">
+    <div className="ml-64 p-6 min-h-screen bg-gray-100" style={{ backgroundColor: "#eff2f4" }}>
+      <Navbar />
+      <div className="max-w-7xl mx-auto"  >
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
           <h2 className="text-2xl font-semibold">Your MCQs</h2>
           <div className="flex w-full sm:w-auto gap-3">

@@ -21,7 +21,7 @@ const Login = () => {
     try {
       // For admin login
       if (isAdmin) {
-        console.log('Starting admin login process...');
+        console.log('Starting admin lwogin process...');
         console.log('Admin login data:', { email, password, acclevel: [2, 3] });
         
         const requestBody = {

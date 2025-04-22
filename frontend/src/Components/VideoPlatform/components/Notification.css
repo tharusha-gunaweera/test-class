@@ -1,0 +1,82 @@
+/* Dark Theme Toast Container */
+.Toastify__toast {
+  background: #2d3748 !important; /* Dark gray-blue background */
+  color: #f7fafc !important; /* Light text color */
+  border-radius: 8px !important;
+  padding: 16px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Purple Progress Bar */
+.Toastify__progress-bar {
+  background: #9f7aea !important; /* Purple color */
+  height: 3px !important;
+}
+
+/* Quiz Toast Specific Styles */
+.quiz-toast {
+  font-family: 'Inter', sans-serif;
+  width: 100%;
+}
+
+.toast-sender {
+  color: #a0aec0;
+  font-size: 0.85rem;
+  margin-bottom: 8px;
+}
+
+.toast-question {
+  font-size: 1rem;
+  margin-bottom: 12px;
+  color: #ffffff;
+}
+
+.toast-answers {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.toast-answer {
+  padding: 8px 12px;
+  background: #4a5568;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #e2e8f0;
+}
+
+.toast-answer:hover {
+  background: #5a677a;
+}
+
+.toast-answer.selected {
+  background: #6b46c1;
+  color: white;
+}
+
+.toast-answer.correct {
+  background: #38a169;
+  color: white;
+}
+
+/* Button styles (from your original CSS) */
+#notify {
+  padding: 8px 16px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}

@@ -27,7 +27,7 @@ const TeacherDashboard = () => {
       <Navbar />
       
       {/* Main Content Area */}
-      <div className="flex-1 overflow-auto ml-[270px]">
+      <div className="flex-1 overflow-auto ml-[270px]" style={{ backgroundColor: "#eff2f4" }}>
         {/* Top Navigation */}
         <header className="bg-white shadow-sm p-4 sticky top-0 z-10">
           <div className="flex justify-between items-center">

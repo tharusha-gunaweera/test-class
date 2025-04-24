@@ -5,7 +5,9 @@ import StudentNav from "./Components/Students/Navbar";
 import ChatBox from "./Components/Students/ChatBox";
 import MyClasses from "./Components/Students/MyClasses";
 import TeacherDashboard from "./Components/Teacher/TeachersDashboard";
+import TeacherClasses from "./Components/Teacher/ClassManagement";
 import TeacherNav from "./Components/Teacher/Navbar";
+import McqSection from "./Components/Teacher/McqSection";
 import AdminDashboard from "./Components/Admin/AdminDashboard";
 // import TeacherDashboard from "./Components/Teacher/TeacherDashBoard";
 // import TeacherChatBox from "./Components/Students/ChatBox";
@@ -33,14 +35,14 @@ function App() {
             <Route path="/MyClasses" element={<MyClasses />} />
 
             <Route path="/TeacherDashboard" element={<TeacherDashboard />} />
-            <Route path="/ChatBox" element={<MyClasses />} />
+            <Route path="/TeacherClasses" element={<TeacherClasses />} />
             <Route path="/MyClasses" element={<MyClasses />} />
+            <Route path="/McqSection" element={<McqSection />} />
 
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/users" element={<AdminDashboard />} />
             <Route path="/admin/classes" element={<AdminDashboard />} />
             <Route path="/admin/settings" element={<AdminDashboard />} />
-
           </Routes>
         </div>
         {/* <Navbar /> */}

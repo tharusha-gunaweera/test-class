@@ -2,7 +2,7 @@ require('dotenv').config();
 
 const express = require('express');     
 const mongoose = require('mongoose');
-const McqRouter = require('./Routes/McqRoutes');
+const ClassRouter = require('./Routes/ClassRoutes');
 const userRouter = require('./Routes/UserRoutes');
 
 const app = express();
@@ -11,7 +11,7 @@ const cors = require('cors');
 
 app.use(express.json());
 app.use(cors());
-app.use("/Mcqs",McqRouter);
+app.use("/Classes",ClassRouter);
 app.use("/Users",userRouter)
 
 const mongoURL = process.env.MONGO_URI;

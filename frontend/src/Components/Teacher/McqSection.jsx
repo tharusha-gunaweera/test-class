@@ -5,9 +5,7 @@ import Navbar from "./Navbar";
 import EditForm from './EditForm';
 import AddMcqForm from './AddMcqForm';
 
-const API_URL = "http://localhost:5000/Mcqs";
-
-function DashBoard() {
+function McqSection({ classId, className, onBack }) {
   const [mcqs, setMcqs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -16,11 +14,11 @@ function DashBoard() {
   const [showAddForm, setShowAddForm] = useState(false);
 
   const fetchMcqs = async () => {
-     try {
-       setLoading(true);
-       setError(null);
-       const { data } = await axios.get(API_URL);
-       setMcqs(data.Mcqs || []);
+    try {
+      setLoading(true);
+      const response = await axios.get(`http://localhost:5000/Classes/${classId}`);
+      setMcqs(response.data.mcqs || []);
+      setError(null);
     } catch (err) {
       setError(err.response?.data?.message || err.message);
     } finally {
@@ -28,11 +26,14 @@ function DashBoard() {
     }
   };
 
-  useEffect(() => { fetchMcqs(); }, []);
+  useEffect(() => { 
+    if (classId) {
+      fetchMcqs();
+    }
+  }, [classId]);
 
   const filteredMcqs = mcqs.filter(mcq =>
-    mcq.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    mcq.clName?.toLowerCase().includes(searchTerm.toLowerCase())
+    mcq.question.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleEditClick = (mcqId) => setEditingMcqId(mcqId);
@@ -40,7 +41,16 @@ function DashBoard() {
 
   const handleSaveEdit = async (updatedMcq) => {
     try {
-      await axios.put(`${API_URL}/${editingMcqId}`, updatedMcq);
+      const classData = await axios.get(`http://localhost:5000/Classes/${classId}`);
+      const updatedMcqs = classData.data.mcqs.map(mcq => 
+        mcq._id === updatedMcq._id ? updatedMcq : mcq
+      );
+      
+      await axios.put(`http://localhost:5000/Classes/${classId}`, {
+        ...classData.data,
+        mcqs: updatedMcqs
+      });
+      
       await fetchMcqs();
       setEditingMcqId(null);
     } catch (err) {
@@ -48,13 +58,19 @@ function DashBoard() {
     }
   };
 
-  
   const handleAddClick = () => setShowAddForm(true);
   const handleCancelAdd = () => setShowAddForm(false);
 
-  const handleSaveNewMcq = async (newMcq) => {
+  const handleAddMcq = async (newMcq) => {
     try {
-      await axios.post(API_URL, newMcq);
+      const classData = await axios.get(`http://localhost:5000/Classes/${classId}`);
+      const updatedMcqs = [...(classData.data.mcqs || []), newMcq];
+      
+      await axios.put(`http://localhost:5000/Classes/${classId}`, {
+        ...classData.data,
+        mcqs: updatedMcqs
+      });
+      
       await fetchMcqs();
       setShowAddForm(false);
     } catch (err) {
@@ -62,9 +78,16 @@ function DashBoard() {
     }
   };
 
-  const handleDeleteMcq = async (id) => {
+  const handleDeleteMcq = async (mcqId) => {
     try {
-      await axios.delete(`${API_URL}/${id}`);
+      const classData = await axios.get(`http://localhost:5000/Classes/${classId}`);
+      const updatedMcqs = classData.data.mcqs.filter(mcq => mcq._id !== mcqId);
+      
+      await axios.put(`http://localhost:5000/Classes/${classId}`, {
+        ...classData.data,
+        mcqs: updatedMcqs
+      });
+      
       await fetchMcqs();
     } catch (err) {
       setError(err.response?.data?.message || err.message);
@@ -86,9 +109,17 @@ function DashBoard() {
   return (
     <div className="ml-64 p-6 min-h-screen bg-gray-100" style={{ backgroundColor: "#eff2f4" }}>
       <Navbar />
-      <div className="max-w-7xl mx-auto"  >
+      <div className="max-w-7xl mx-auto">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-          <h2 className="text-2xl font-semibold">Your MCQs</h2>
+          <div>
+            <h2 className="text-2xl font-semibold">MCQs for {className}</h2>
+            <button
+              onClick={onBack}
+              className="text-blue-600 hover:text-blue-800 mt-2"
+            >
+              ← Back to Classes
+            </button>
+          </div>
           <div className="flex w-full sm:w-auto gap-3">
             <div className="relative flex-1 sm:w-64">
               <FiSearch className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400" />
@@ -105,10 +136,17 @@ function DashBoard() {
               className="flex items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
             >
               <FiPlus className="mr-2" />
-              Add MCQs
+              Add MCQ
             </button>
           </div>
         </div>
+
+        {showAddForm && (
+          <AddMcqForm
+            onSubmit={handleAddMcq}
+            onCancel={handleCancelAdd}
+          />
+        )}
 
         {filteredMcqs.length > 0 ? (
           <div className="space-y-4">
@@ -118,7 +156,6 @@ function DashBoard() {
                   <div>
                     <h3 className="text-lg font-medium">{mcq.question}</h3>
                     <div className="flex space-x-4 mt-2 text-sm text-gray-600">
-                      <span>Class: {mcq.clName}</span>
                       <span>Uploaded: {new Date(mcq.createdAt).toLocaleDateString()}</span>
                     </div>
                   </div>
@@ -164,11 +201,9 @@ function DashBoard() {
             </p>
           </div>
         )}
-
-        
       </div>
     </div>
   );
 }
 
-export default DashBoard;
+export default McqSection;

@@ -96,7 +96,7 @@ function App() {
               setWebcamOn(false);
               setMicOn(false);
               setMeetingStarted(false);
-              // Clear meeting state when leaving
+              // Clear meetng state when leaving
               sessionStorage.removeItem('meetingState');
             }}
             setIsMeetingLeft={setIsMeetingLeft}

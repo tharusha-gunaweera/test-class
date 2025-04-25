@@ -395,14 +395,14 @@ export function BottomBar({ bottomBarHeight, setIsMeetingLeft }) {
   };
 
   const LeaveBTN = () => {
-    const { leave } = useMeeting();
+    const { leave,end } = useMeeting();
 
     return (
       <OutlinedButton
         Icon={EndIcon}
         bgColor="bg-red-150"
         onClick={() => {
-          leave();
+          end();
           setIsMeetingLeft(true);
         }}
         tooltip="Leave Meeting"

@@ -37,26 +37,6 @@ function McqSection({ classId, className, onBack }) {
   );
 
   const handleEditClick = (mcqId) => setEditingMcqId(mcqId);
-  const handleCancelEdit = () => setEditingMcqId(null);
-
-  const handleSaveEdit = async (updatedMcq) => {
-    try {
-      const classData = await axios.get(`http://localhost:5000/Classes/${classId}`);
-      const updatedMcqs = classData.data.mcqs.map(mcq => 
-        mcq._id === updatedMcq._id ? updatedMcq : mcq
-      );
-      
-      await axios.put(`http://localhost:5000/Classes/${classId}`, {
-        ...classData.data,
-        mcqs: updatedMcqs
-      });
-      
-      await fetchMcqs();
-      setEditingMcqId(null);
-    } catch (err) {
-      setError(err.response?.data?.message || err.message);
-    }
-  };
 
   const handleAddClick = () => setShowAddForm(true);
   const handleCancelAdd = () => setShowAddForm(false);
@@ -64,14 +44,25 @@ function McqSection({ classId, className, onBack }) {
   const handleAddMcq = async (newMcq) => {
     try {
       const classData = await axios.get(`http://localhost:5000/Classes/${classId}`);
-      const updatedMcqs = [...(classData.data.mcqs || []), newMcq];
       
-      await axios.put(`http://localhost:5000/Classes/${classId}`, {
+      // Ensure the MCQ has all required fields
+      const formattedMcq = {
+        question: newMcq.question.trim(),
+        options: newMcq.options.map(opt => opt.trim()),
+        correctAnswer: parseInt(newMcq.correctAnswer)
+      };
+
+      // Create updated class data with new MCQ
+      const updatedClass = {
         ...classData.data,
-        mcqs: updatedMcqs
-      });
+        mcqs: [...(classData.data.mcqs || []), formattedMcq]
+      };
+
+      // Send PUT request to update class
+      const response = await axios.put(`http://localhost:5000/Classes/${classId}`, updatedClass);
       
-      await fetchMcqs();
+      // Update local state
+      setMcqs(response.data.mcqs || []);
       setShowAddForm(false);
     } catch (err) {
       setError(err.response?.data?.message || err.message);
@@ -143,7 +134,8 @@ function McqSection({ classId, className, onBack }) {
 
         {showAddForm && (
           <AddMcqForm
-            onSubmit={handleAddMcq}
+            classId={classId}
+            onSave={handleAddMcq}
             onCancel={handleCancelAdd}
           />
         )}

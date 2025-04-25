@@ -1,4 +1,5 @@
-const User  = require('../Model/UserModel');
+const User = require('../Model/UserModel');
+const bcrypt = require('bcryptjs');
 
 //user display 
 const getAllUsers = async(request,response,next) => {
@@ -76,9 +77,10 @@ const login = async (request, response, next) => {
         }
       }
   
-      // Basic password match (should be hashed in real apps)
+      // Compare password with hashed password
       console.log('Checking password match');
-      if (user.password !== password) {
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      if (!isPasswordValid) {
         console.log('Password check failed');
         return response.status(401).json({ message: "Invalid password" });
       }
@@ -107,25 +109,43 @@ const login = async (request, response, next) => {
   
 
 //data insert
-const addUsers = async(request,response,next) => {
-    const {username,email,school,grade,address,password,acclevel} = request.body;
+const addUsers = async (request, response, next) => {
+  const { username, email, school, grade, address, password, acclevel } = request.body;
 
-    let users;
+  let hashedPassword;
 
-    try{
-        users = new User({username,email,school,grade,address,password,acclevel});
-        await users.save();
-    }catch(err){
-        console.log(err);
-    }
+  try {
+      
+      hashedPassword = await bcrypt.hash(password, 10);
+  } catch (err) {
+      console.log("Password encryption error:", err);
+      return response.status(500).json({ message: "Error encrypting password" });
+  }
 
-    //not insert users to the database
-    if(!users){
-        return response.status(404).json({message:"Unable to insert users"});
-    }
+  let users;
 
-    return response.status(200).json({users});
-}
+  try {
+      users = new User({
+          username,
+          email,
+          school,
+          grade,
+          address,
+          password: hashedPassword, 
+          acclevel
+      });
+      await users.save();
+  } catch (err) {
+      console.log("User creation error:", err);
+      return response.status(500).json({ message: "Signup failed, please try again." });
+  }
+
+  if (!users) {
+      return response.status(400).json({ message: "Unable to insert users" });
+  }
+
+  return response.status(201).json({ users });
+};
 
 const getById = async(req,res,next) =>{
     const id = req.params.id;

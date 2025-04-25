@@ -55,7 +55,7 @@ const Login = () => {
     try {
       // For admin login
       if (isAdmin) {
-        console.log('Starting admin lwogin process...');
+        console.log('Starting admin login process...');
         console.log('Admin login data:', { email, password, acclevel: [2, 3] });
         
         const requestBody = {
@@ -78,7 +78,8 @@ const Login = () => {
         console.log('Raw admin login response:', responseData);
 
         if (!response.ok) {
-          throw new Error(responseData || 'Login failed. Please check your credentials.');
+          const errorData = JSON.parse(responseData);
+          throw new Error(errorData.message || 'Login failed. Please check your credentials.');
         }
 
         const data = JSON.parse(responseData);
@@ -88,62 +89,44 @@ const Login = () => {
         const userRole = data.user.acclevel;
 
         switch(userRole) {
-        case 2: // Teacher
-          navigate('/TeacherDashboard');
-          break;
-        case 3: // Admin
-          navigate('/admin');
-          break;
-        default:
-          navigate('/');
+          case 2: // Teacher
+            navigate('/TeacherDashboard');
+            break;
+          case 3: // Admin
+            navigate('/admin');
+            break;
+          default:
+            navigate('/');
+        }
+        return;
+      } else {
+        // For student/teacher login
+        const response = await fetch('http://localhost:5000/Users/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            username,
+            password,
+            acclevel: 1 // Default to student level
+          }),
+        });
 
+        const responseData = await response.text();
+
+        if (!response.ok) {
+          const errorData = JSON.parse(responseData);
+          throw new Error(errorData.message || 'Login failed. Please check your credentials.');
+        }
+
+        const data = JSON.parse(responseData);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        localStorage.setItem('token', data.token);
+
+        navigate('/Dashboard');
         return;
       }
-        
-      } else {
-
-      // For student/teacher login
-      const response = await fetch('http://localhost:5000/Users/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username,
-          password,
-          acclevel: 1 // Default to student level
-        }),
-      });
-
-
-      const responseData = await response.text();
-
-      if (!response.ok) {
-        throw new Error(responseData || 'Login failed. Please check your credentials.');
-      }
-
-      const data = JSON.parse(responseData);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      localStorage.setItem('token', data.token);
-
-      navigate('/Dashboard');
-      return;
-
-    }
-
-      console.log('Student/teacher login response status:', response.status);
-      
-      console.log('Student/teacher login response:', responseData);
-
-      
-
-      
-
-      console.log("incomming acc level: " , data.user.acclevel);
-
-      // Redirect based on user role
-      
-      
     } catch (err) {
       console.error('Login error:', err);
       setError(err.message || 'Login failed. Please try again.');

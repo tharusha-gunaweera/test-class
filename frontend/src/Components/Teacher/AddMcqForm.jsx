@@ -1,14 +1,11 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const API_URL = "http://localhost:5000/Mcqs";
-
-const AddMcqForm = ({ onSave, onCancel }) => {
+const AddMcqForm = ({ classId, onSave, onCancel }) => {
   const [formData, setFormData] = useState({
     question: '',
     options: ['', '', '', ''],
-    correctAnswer: 0,
-    clName: ''  
+    correctAnswer: 0
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -31,6 +28,11 @@ const AddMcqForm = ({ onSave, onCancel }) => {
     setError(null);
 
     try {
+      // Validate form data
+      if (!formData.question.trim()) {
+        throw new Error('Question is required');
+      }
+
       // Check for duplicate options
       const optionsSet = new Set(formData.options);
       if (optionsSet.size !== formData.options.length) {
@@ -41,25 +43,24 @@ const AddMcqForm = ({ onSave, onCancel }) => {
         throw new Error('All options must be filled');
       }
 
+      // Create new MCQ with proper structure
       const newMcq = {
-        question: formData.question,
-        clName: formData.clName,
-        options: formData.options,
-        correctAnswer: formData.correctAnswer
+        question: formData.question.trim(),
+        options: formData.options.map(opt => opt.trim()),
+        correctAnswer: parseInt(formData.correctAnswer)
       };
 
-      const response = await axios.post(API_URL, newMcq);
-      
+      // Reset form
       setFormData({
         question: '',
         options: ['', '', '', ''],
-        correctAnswer: 0,
-        clName: ''
+        correctAnswer: 0
       });
 
-      onSave(response.data);
+      // Notify parent component with the new MCQ
+      onSave(newMcq);
     } catch (err) {
-      setError(err.response?.data?.message || err.message || 'Failed to save MCQ');
+      setError(err.message || 'Failed to save MCQ');
     } finally {
       setIsSubmitting(false);
     }
@@ -90,18 +91,6 @@ const AddMcqForm = ({ onSave, onCancel }) => {
           </div>
 
           <div className="mb-4">
-            <label className="block text-gray-700 mb-2">Class</label>
-            <input
-              type="text"
-              name="clName"
-              value={formData.clName}
-              onChange={handleChange}
-              className="w-full p-2 border rounded"
-              required
-            />
-          </div>
-
-          <div className="mb-4">
             <label className="block text-gray-700 mb-2">Options (Mark correct answer)</label>
             {formData.options.map((option, index) => (
               <div key={index} className="flex items-center mb-2">
@@ -114,7 +103,7 @@ const AddMcqForm = ({ onSave, onCancel }) => {
                 />
                 <input
                   type="radio"
-                  name="correctOption"
+                  name="correctAnswer"
                   checked={formData.correctAnswer === index}
                   onChange={() => setFormData(prev => ({ ...prev, correctAnswer: index }))}
                   className="ml-2"

@@ -12,15 +12,15 @@ const userSchema = new Schema({
     },
     school:{
         type:String,
-        required:true, 
+        required:false, 
     },
     grade:{
         type:Number,
-        required:true, 
+        required:false, 
     },
     address:{
         type:String,
-        required:true, 
+        required:false, 
     },
     password:{
         type:String,

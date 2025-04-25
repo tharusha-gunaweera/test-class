@@ -1,5 +1,22 @@
 const mongoose = require('mongoose');
 
+const mcqSchema = new mongoose.Schema({
+    question: {
+        type: String,
+        required: true
+    },
+    correctAnswer: {
+        type: Number,
+        required: true,
+        min: 0,
+        max: 3
+    },
+    options: [{
+        type: String,
+        required: true
+    }]
+});
+
 const classSchema = new mongoose.Schema({
     className: {
         type: String,
@@ -23,22 +40,7 @@ const classSchema = new mongoose.Schema({
     description: {
         type: String
     },
-    mcqs: [{
-        question: {
-            type: String,
-            required: true
-        },
-        correctAnswer: {
-            type: Number,
-            required: true,
-            min: 0,
-            max: 3
-        },
-        options: [{
-            type: String,
-            required: true
-        }]
-    }]
+    mcqs: [mcqSchema]
 }, {
     timestamps: true
 });

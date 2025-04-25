@@ -109,7 +109,7 @@ const Login = () => {
           body: JSON.stringify({
             username,
             password,
-            acclevel: 1 // Default to student level
+            acclevel: 1 // Defaault to student level
           }),
         });
 

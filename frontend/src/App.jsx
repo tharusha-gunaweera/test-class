@@ -53,7 +53,7 @@ function App() {
     }
   }, [isMobile]);
 
-  // Save meeting state when it changes
+  // Save meeeting state when it changes
   useEffect(() => {
     if (isMeetingStarted && meetingId && token) {
       sessionStorage.setItem('meetingState', JSON.stringify({

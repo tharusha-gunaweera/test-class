@@ -38,7 +38,7 @@ function App() {
       }
     } catch (error) {
       console.error("Error restoring meeting state:", error);
-      // Clear potentially corrupted state
+      // Clear potentiallay corrupted state
       sessionStorage.removeItem('meetingState');
     } finally {
       setIsInitialized(true);

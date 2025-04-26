@@ -7,6 +7,8 @@ const ClassManagement = () => {
   // Class Management State
   const [classes, setClasses] = useState([]);
   const [formData, setFormData] = useState({
+    teacherID:'',
+    teacherName:'',
     className: '',
     subject: '',
     schedule: '',
@@ -25,12 +27,16 @@ const ClassManagement = () => {
   const [showMCQSection, setShowMCQSection] = useState(false);
   const [currentClassId, setCurrentClassId] = useState(null);
   const [currentClassName, setCurrentClassName] = useState('');
-  const [mcqFormData, setMcqFormData] = useState({
-    question: '',
-    options: ['', '', '', ''],
-    correctAnswer: 0
-  });
-  const [showMcqForm, setShowMcqForm] = useState(false);
+  const [user, setUser] = useState(null);
+  
+    useEffect(() => {
+      // Get user data from localStorage
+      const userData = localStorage.getItem('user');
+      if (userData) {
+        setUser(JSON.parse(userData));
+      }
+    }, []);
+
 
   // Load classes from API
   const loadClasses = async () => {
@@ -47,6 +53,8 @@ const ClassManagement = () => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
+      teacherID: user?._id,
+      teacherName: user?.username,
       [name]: value
     }));
   };
@@ -90,6 +98,8 @@ const ClassManagement = () => {
       
       // Reset form
       setFormData({
+        teacherID:'',
+        teacherName:'',
         className: '',
         subject: '',
         schedule: '',
@@ -146,73 +156,6 @@ const ClassManagement = () => {
     }
   };
 
-  const handleMCQInputChange = (e) => {
-    const { name, value } = e.target;
-    setMcqFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleOptionChange = (index, value) => {
-    const newOptions = [...mcqFormData.options];
-    newOptions[index] = value;
-    setMcqFormData(prev => ({
-      ...prev,
-      options: newOptions
-    }));
-  };
-
-  const handleMCQSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const classData = classes.find(cls => cls._id === currentClassId);
-      if (!classData) return;
-
-      const updatedClass = {
-        ...classData,
-        mcqs: [...(classData.mcqs || []), {
-          question: mcqFormData.question,
-          options: mcqFormData.options,
-          correctAnswer: parseInt(mcqFormData.correctAnswer)
-        }]
-      };
-
-      const response = await axios.put(`http://localhost:5000/Classes/${currentClassId}`, updatedClass);
-      setClasses(classes.map(cls => 
-        cls._id === currentClassId ? response.data : cls
-      ));
-
-      setMcqFormData({
-        question: '',
-        options: ['', '', '', ''],
-        correctAnswer: 0
-      });
-      setShowMcqForm(false);
-    } catch (error) {
-      console.error('Error adding MCQ:', error);
-    }
-  };
-
-  const handleDeleteMCQ = async (classId, mcqIndex) => {
-    try {
-      const classData = classes.find(cls => cls._id === classId);
-      if (!classData) return;
-
-      const updatedMCQs = classData.mcqs.filter((_, index) => index !== mcqIndex);
-      const updatedClass = {
-        ...classData,
-        mcqs: updatedMCQs
-      };
-
-      const response = await axios.put(`http://localhost:5000/Classes/${classId}`, updatedClass);
-      setClasses(classes.map(cls => 
-        cls._id === classId ? response.data : cls
-      ));
-    } catch (error) {
-      console.error('Error deleting MCQ:', error);
-    }
-  };
 
   const handleBackToClasses = () => {
     setShowMCQSection(false);
@@ -232,7 +175,7 @@ const ClassManagement = () => {
     cls.schedule.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const currentClassMCQs = classes.find(cls => cls._id === currentClassId)?.mcqs || [];
+  
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 py-6 px-4">

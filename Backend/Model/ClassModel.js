@@ -18,6 +18,14 @@ const mcqSchema = new mongoose.Schema({
 });
 
 const classSchema = new mongoose.Schema({
+    teacherID: {
+        type: String,
+        required: true
+    },
+    teacherName: {
+        type: String,
+        required: true
+    },
     className: {
         type: String,
         required: true

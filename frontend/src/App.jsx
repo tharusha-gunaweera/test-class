@@ -1,4 +1,5 @@
 import { MeetingProvider } from "@videosdk.live/react-sdk";
+import { useSearchParams } from 'react-router-dom';
 import { useEffect } from "react";
 import { useState } from "react";
 import { MeetingAppProvider } from "./Components/VideoPlatform/MeetingAppContextDef";
@@ -17,14 +18,34 @@ function App() {
   const [isMeetingStarted, setMeetingStarted] = useState(false);
   const [isMeetingLeft, setIsMeetingLeft] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [UserName, setUserName] = useState("");
+  const [classId, setClassId] = useState("");
+  const [isMeetingCreater, setisMeetingCreater] = useState("");
 
   const isMobile = window.matchMedia(
     "only screen and (max-width: 768px)"
   ).matches;
 
+  const [searchParams] = useSearchParams();
+  
+  useEffect(() => {
+    const userName = searchParams.get("userName");
+    const isMeetingCreater = searchParams.get("isMeetingCreater");
+    const classID = searchParams.get("meetingId");
+
+    console.log("The value is:",isMeetingCreater);
+    if (isMeetingCreater) {
+      setisMeetingCreater(isMeetingCreater);
+    }
+    setUserName(userName);
+    setClassId(classID);
+  }, [searchParams]);
+
   // Add effect to handle persisted meeting state
   useEffect(() => {
     try {
+
+      
       const savedMeetingState = sessionStorage.getItem('meetingState');
       if (savedMeetingState) {
         const { meetingId: savedMeetingId, participantName: savedName, token: savedToken, isJoined } = JSON.parse(savedMeetingState);
@@ -113,6 +134,9 @@ function App() {
           micOn={micOn}
           setMicOn={setMicOn}
           webcamOn={webcamOn}
+          UserName={UserName}
+          classId={classId}
+          isCreateMeeting={isMeetingCreater}
           setWebcamOn={setWebcamOn}
           customAudioStream={customAudioStream}
           setCustomAudioStream={setCustomAudioStream}

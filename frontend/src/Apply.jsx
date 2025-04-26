@@ -10,7 +10,7 @@ import TeacherNav from "./Components/Teacher/Navbar";
 import McqSection from "./Components/Teacher/McqSection";
 import AdminDashboard from "./Components/Admin/AdminDashboard";
 import Test from "./Components/Students/test"
-import TestTeacher from "./Components/Teacher/test"
+import TestTeacher from "./Components/Teacher/UpcommingClasses"
 // import TeacherDashboard from "./Components/Teacher/TeacherDashBoard";
 // import TeacherChatBox from "./Components/Students/ChatBox";
 // import TeacherMyClasses from "./Components/Students/MyClasses";
@@ -18,6 +18,7 @@ import TeachersTimeTable from "./Components/Students/scheduler";
 import Login from './Components/Students/Auth/login';
 import Signup from './Components/Students/Auth/Signup';
 import LandingPage from './Components/LandingPage';
+
 import { registerLicense } from '@syncfusion/ej2-base';
 
 registerLicense("Ngo9BigBOggjHTQxAR8/V1NNaF5cXmpCe0x0R3xbf1x1ZFRMZF1bRHVPIiBoS35Rc0VnW3tec3BTQ2ZbWE10VEBU");

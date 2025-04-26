@@ -110,7 +110,7 @@ const login = async (request, response, next) => {
 
 //data insert
 const addUsers = async (request, response, next) => {
-  const { username, email, school, grade, address, password, acclevel } = request.body;
+  const { honorifics,username, email, school, grade, address, password, acclevel } = request.body;
 
   let hashedPassword;
 
@@ -126,6 +126,7 @@ const addUsers = async (request, response, next) => {
 
   try {
       users = new User({
+        honorifics,
           username,
           email,
           school,
@@ -169,12 +170,12 @@ const getById = async(req,res,next) =>{
 
 const updateUsers = async (req, res, next) => {
     const id = req.params.id;
-    const {name,gmail,age,address} = req.body;
+    const {honorifics,name,gmail,age,address} = req.body;
 
     let users;
 
     try{
-        users = await User.findByIdAndUpdate(id, {name:name,gmail:gmail, age:age, address:address});
+        users = await User.findByIdAndUpdate(id, {honorifics:honorifics,name:name,gmail:gmail, age:age, address:address});
 
         users = await users.save();
     }catch(err){

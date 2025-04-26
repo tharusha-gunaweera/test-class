@@ -27,6 +27,9 @@ export function JoiningScreen({
   micOn,
   webcamOn,
   setWebcamOn,
+  UserName,
+  classId,
+  isCreateMeeting,
   setMicOn,
   customAudioStream,
   setCustomAudioStream,
@@ -463,6 +466,9 @@ export function JoiningScreen({
                     participantName={participantName}
                     setParticipantName={setParticipantName}
                     videoTrack={videoTrack}
+                    UserName={UserName}
+                    classId={classId}
+                    isCreateMeeting={isCreateMeeting}
                     setVideoTrack={setVideoTrack}
                     onClickStartMeeting={onClickStartMeeting}
                     onClickJoin={async (id) => {

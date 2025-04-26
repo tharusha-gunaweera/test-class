@@ -13,6 +13,8 @@ exports.getAllClasses = async (req, res) => {
 // Create a new class
 exports.createClass = async (req, res) => {
     const classData = new Class({
+        teacherID: req.body.teacherID,
+        teacherName: req.body.teacherName,
         className: req.body.className,
         subject: req.body.subject,
         schedule: req.body.schedule,

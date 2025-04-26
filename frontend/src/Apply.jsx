@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Navbar from "./Components/Students/Navbar";
+import VideoPlatform from "./App";
 import StudentDashboard from "./Components/Students/StudentDashboard";
 import StudentNav from "./Components/Students/Navbar";
 import ChatBox from "./Components/Students/ChatBox";
@@ -9,6 +9,8 @@ import TeacherClasses from "./Components/Teacher/ClassManagement";
 import TeacherNav from "./Components/Teacher/Navbar";
 import McqSection from "./Components/Teacher/McqSection";
 import AdminDashboard from "./Components/Admin/AdminDashboard";
+import Test from "./Components/Students/test"
+import TestTeacher from "./Components/Teacher/test"
 // import TeacherDashboard from "./Components/Teacher/TeacherDashBoard";
 // import TeacherChatBox from "./Components/Students/ChatBox";
 // import TeacherMyClasses from "./Components/Students/MyClasses";
@@ -35,6 +37,10 @@ function App() {
             <Route path="/Dashboard" element={<StudentDashboard />} />
             <Route path="/ChatBox" element={<ChatBox />} />
             <Route path="/MyClasses" element={<MyClasses />} />
+            <Route path="/test" element={<Test />} />
+            <Route path="/TestTeacher" element={<TestTeacher />} />
+
+            <Route path="/VideoPlatform" element={<VideoPlatform />} />
 
             <Route path="/TeacherDashboard" element={<TeacherDashboard />} />
             <Route path="/TeacherClasses" element={<TeacherClasses />} />

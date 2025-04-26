@@ -4,7 +4,7 @@ import {
   usePubSub,
   useMediaDevice,
 } from "@videosdk.live/react-sdk";
-import React, { Fragment, useMemo, useRef, useState } from "react";
+import React, { Fragment, useMemo, useRef, useState, useEffect } from "react";
 import {
   ClipboardIcon,
   CheckIcon,
@@ -36,6 +36,8 @@ const MicBTN = () => {
   } = useMeetingAppContext();
 
   const { getMicrophones, getPlaybackDevices } = useMediaDevice();
+
+
 
   const mMeeting = useMeeting();
   const [mics, setMics] = useState([]);
@@ -372,6 +374,27 @@ const WebCamBTN = () => {
 export function BottomBar({ bottomBarHeight, setIsMeetingLeft }) {
   const { sideBarMode, setSideBarMode } = useMeetingAppContext();
 
+  const [user, setUser] = useState(null);
+    
+  useEffect(() => {
+   
+    const userData = localStorage.getItem('user');
+    console.log("Raw user data from localStorage:", userData);
+    
+    if (userData) {
+      try {
+        const parsedUser = JSON.parse(userData);
+        console.log("Parsed user data:", parsedUser);
+        setUser(parsedUser);
+      } catch (error) {
+        console.error("Error parsing user data:", error);
+      }
+    } else {
+      console.log("No user data found in localStorage");
+      
+    }
+  }, []);
+
   const ScreenShareBTN = () => {
     const { localScreenShareOn, toggleScreenShare, presenterId } = useMeeting();
 
@@ -395,17 +418,25 @@ export function BottomBar({ bottomBarHeight, setIsMeetingLeft }) {
   };
 
   const LeaveBTN = () => {
-    const { leave,end } = useMeeting();
+    const { leave, end } = useMeeting();
+
+    const handleLeave = () => {
+      // Check if user is a teacher (accLevel 2) or admin (accLevel 3)
+      const canEndMeeting = user && (user.acclevel === 2 || user.acclevel === 3);
+      
+      if (canEndMeeting) {
+        end();
+      }
+      leave();
+      setIsMeetingLeft(true);
+    };
 
     return (
       <OutlinedButton
         Icon={EndIcon}
         bgColor="bg-red-150"
-        onClick={() => {
-          end();
-          setIsMeetingLeft(true);
-        }}
-        tooltip="Leave Meeting"
+        onClick={handleLeave}
+        tooltip={user && (user.acclevel === 2 || user.acclevel === 3) ? "End Meeting" : "Leave Meeting"}
       />
     );
   };

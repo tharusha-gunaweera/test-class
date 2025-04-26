@@ -25,7 +25,7 @@ export default function StudentDashboard() {
         <div className="flex justify-between items-center bg-white p-4 shadow-sm rounded-md">
           <div className="flex items-center space-x-2">
             <img src="/logo.png" alt="Royal Academy Logo" className="h-10" />
-            <div className="text-blue-800 font-bold text-xl">ROYAL ACADEMY</div>
+            <div className="text-blue-800 font-bold text-xl">GATHIKA ACADEMY</div>
           </div>
           <div className="flex items-center space-x-2">
             <span className="text-gray-700">Hello ,</span>

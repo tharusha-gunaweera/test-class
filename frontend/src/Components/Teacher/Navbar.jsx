@@ -79,7 +79,7 @@ const Navbar = () => {
         </NavLink>
 
         <NavLink
-          to="/TeacherTimeTable"
+          to="/TestTeacher"
           className="w-[300px] justify-center flex items-center gap-3 px-6 py-3 text-sm font-medium font-[Poppins] transition-all text-gray-500 hover:text-blue-500"
         >
           {({ isActive }) => (
@@ -88,11 +88,13 @@ const Navbar = () => {
                 isActive ? "text-blue-700 bg-blue-100" : "text-gray-500"
               }`}
             >
-              <CalendarIcon className="w-5 h-5" />
-              Time table
+              <AcademicCapIcon className="w-5 h-5" />
+              Video Platform
             </span>
           )}
         </NavLink>
+
+        
 
         
       </div>

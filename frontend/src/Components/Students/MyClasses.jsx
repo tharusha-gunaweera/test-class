@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useSearchParams   } from 'react-router-dom';
 import { Clock, Lock, CheckCircle, Search } from 'react-feather';
 import Navbar from './Navbar'
 
@@ -286,7 +287,7 @@ const MyClasses = () => {
                       >
                         {currentTime < new Date(selectedClass.date + 'T' + selectedClass.startTime + ':00') ? 
                           'Not started' : 
-                          'Ended'}
+                          'Click to join'}
                       </button>
                     ) : (
                       <button

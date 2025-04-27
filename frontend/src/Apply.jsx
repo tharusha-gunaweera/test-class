@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import VideoPlatform from "./App";
 import StudentDashboard from "./Components/Students/StudentDashboard";
-import StudentNav from "./Components/Students/Navbar";
+import Payment from "./Components/Students/payment";
 import ChatBox from "./Components/Students/ChatBox";
 import MyClasses from "./Components/Students/MyClasses";
 import TeacherDashboard from "./Components/Teacher/TeachersDashboard";
@@ -39,6 +39,9 @@ function App() {
             <Route path="/Dashboard" element={<StudentDashboard />} />
             <Route path="/ChatBox" element={<ChatBox />} />
             <Route path="/MyClasses" element={<MyClasses />} />
+            <Route path="/Payment" element={<Payment />} />
+            
+            
             <Route path="/test" element={<Test />} />
             <Route path="/TestTeacher" element={<TestTeacher />} />
 

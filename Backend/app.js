@@ -4,6 +4,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const ClassRouter = require('./Routes/ClassRoutes');
 const userRouter = require('./Routes/UserRoutes');
+const paymentRouter = require('./Routes/PaymentRoutes');
 
 const app = express();
 const cors = require('cors');
@@ -12,7 +13,8 @@ const cors = require('cors');
 app.use(express.json());
 app.use(cors());
 app.use("/Classes",ClassRouter);
-app.use("/Users",userRouter)
+app.use("/Users",userRouter);
+app.use("/payments",paymentRouter);
 
 const mongoURL = process.env.MONGO_URI;
 

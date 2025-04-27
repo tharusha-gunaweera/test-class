@@ -2,9 +2,11 @@ import React, { useEffect, useState } from "react";
 import Navbar from "./Navbar";
 import Lottie from "lottie-react";
 import welcomeAnimation from "../Animations/welcome-animation.json"; 
+import { useNavigate } from "react-router-dom"; // Import the hook for navigation
 
 export default function StudentDashboard() {
   const [user, setUser] = useState(null);
+  const navigate = useNavigate(); // Initialize navigate hook
 
   useEffect(() => {
     // Get user data from localStorage
@@ -13,6 +15,11 @@ export default function StudentDashboard() {
       setUser(JSON.parse(userData));
     }
   }, []);
+
+  // Function to handle avatar click and navigate to student profile
+  const handleAvatarClick = () => {
+    navigate('/studentProfile'); // Replace with your profile route
+  };
 
   return (
     <div className="flex h-screen w-full">
@@ -30,8 +37,13 @@ export default function StudentDashboard() {
           <div className="flex items-center space-x-2">
             <span className="text-gray-700">Hello ,</span>
             <span className="text-blue-600 font-semibold">{user?.username || 'Student'}</span>
-            <span className="text-sm text-gray-500">Student</span>
-            <img src="/avatar.png" alt="User Avatar" className="h-8 w-8 rounded-full" />
+            {/* Clickable avatar */}
+            <img 
+              src="/avatar.png" 
+              alt="User Avatar" 
+              className="h-8 w-8 rounded-full cursor-pointer" 
+              onClick={handleAvatarClick} // Add the click handler
+            />
           </div>
         </div>
 

@@ -20,6 +20,7 @@ import TeachersTimeTable from "./Components/Students/scheduler";
 import Login from './Components/Students/Auth/login';
 import Signup from './Components/Students/Auth/Signup';
 import LandingPage from './Components/LandingPage';
+import StudentProfile from './Components/Students/studentProfile';
 
 import { registerLicense } from '@syncfusion/ej2-base';
 
@@ -38,6 +39,7 @@ function App() {
             <Route path="/signup" element={<Signup />} />
 
             <Route path="/Dashboard" element={<StudentDashboard />} />
+            <Route path="/studentProfile" element={<StudentProfile />} />
             
             <Route path="/MyClasses" element={<MyClasses />} />
             <Route path="/MetirialUpload" element={<MetirialUpload />} />

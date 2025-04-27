@@ -1,15 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import Navbar from './Navbar'; // Your existing sidebar component
+import { useNavigate } from "react-router-dom"; // Import the hook for navigation
 
 const TeacherDashboard = () => {
   const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState('dashboard');
-
+  const navigate = useNavigate(); // Initialize navigate hook
   useEffect(() => {
     const userData = localStorage.getItem('user');
     if (userData) setUser(JSON.parse(userData));
   }, []);
 
+
+   // Function to handle avatar click and navigate to student profile
+   const handleAvatarClick = () => {
+    navigate('/teacherProfile'); // Replace with your profile route
+  };
   // Sample data
   const classes = [
     { id: 1, name: 'Mathematics', time: '9:00 AM', students: 24, room: 'B-204' },
@@ -46,11 +52,13 @@ const TeacherDashboard = () => {
               <div className="flex items-center space-x-2">
                 <span className="text-gray-700">{user?.name || 'Teacher'}</span>
                 <div className="w-8 h-8 rounded-full bg-blue-100 overflow-hidden border border-gray-200">
-                  <img 
-                    src={user?.avatar || '/default-avatar.jpg'} 
-                    alt="Profile" 
-                    className="w-full h-full object-cover"
-                  />
+                  {/* Clickable avatar */}
+                <img 
+                  src="/avatar.png" 
+                  alt="User Avatar" 
+                  className="h-8 w-8 rounded-full cursor-pointer" 
+                  onClick={handleAvatarClick} // Add the click handler
+                />
                 </div>
               </div>
             </div>

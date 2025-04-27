@@ -21,7 +21,7 @@ import Login from './Components/Students/Auth/login';
 import Signup from './Components/Students/Auth/Signup';
 import LandingPage from './Components/LandingPage';
 import StudentProfile from './Components/Students/studentProfile';
-
+import TeacherProfile from "./Components/Teacher/teacherProfile";
 import { registerLicense } from '@syncfusion/ej2-base';
 
 registerLicense("Ngo9BigBOggjHTQxAR8/V1NNaF5cXmpCe0x0R3xbf1x1ZFRMZF1bRHVPIiBoS35Rc0VnW3tec3BTQ2ZbWE10VEBU");
@@ -52,6 +52,7 @@ function App() {
             <Route path="/VideoPlatform" element={<VideoPlatform />} />
 
             <Route path="/TeacherDashboard" element={<TeacherDashboard />} />
+            <Route path="/teacherProfile" element={<TeacherProfile />} />
             <Route path="/TeacherClasses" element={<TeacherClasses />} />
             <Route path="/MyClasses" element={<MyClasses />} />
             <Route path="/TeacherTimeTable" element={<TeachersTimeTable />} />

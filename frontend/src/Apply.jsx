@@ -2,7 +2,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import VideoPlatform from "./App";
 import StudentDashboard from "./Components/Students/StudentDashboard";
 import Payment from "./Components/Students/payment";
-import ChatBox from "./Components/Students/ChatBox";
+import MetirialUpload from "./Components/Students/MetirialUpload";
+import MetirialManage from "./Components/Teacher/Managematerials";
 import MyClasses from "./Components/Students/MyClasses";
 import TeacherDashboard from "./Components/Teacher/TeachersDashboard";
 import TeacherClasses from "./Components/Teacher/ClassManagement";
@@ -37,8 +38,9 @@ function App() {
             <Route path="/signup" element={<Signup />} />
 
             <Route path="/Dashboard" element={<StudentDashboard />} />
-            <Route path="/ChatBox" element={<ChatBox />} />
+            
             <Route path="/MyClasses" element={<MyClasses />} />
+            <Route path="/MetirialUpload" element={<MetirialUpload />} />
             <Route path="/Payment" element={<Payment />} />
             
             
@@ -51,6 +53,7 @@ function App() {
             <Route path="/TeacherClasses" element={<TeacherClasses />} />
             <Route path="/MyClasses" element={<MyClasses />} />
             <Route path="/TeacherTimeTable" element={<TeachersTimeTable />} />
+            <Route path="/MetirialManage" element={<MetirialManage />} />
 
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/AdminManageUsers" element={<AdminManageUsers />} />

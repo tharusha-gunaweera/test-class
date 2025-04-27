@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./Notification.css";
+import { usePubSub } from "@videosdk.live/react-sdk";
 
 const QuizToast = ({ closeToast, question, answers, correctAnswer, senderName }) => {
   const [selectedAnswer, setSelectedAnswer] = useState(null);
@@ -56,31 +57,36 @@ const QuizToast = ({ closeToast, question, answers, correctAnswer, senderName })
   );
 };
 
-const Notification = ({ senderId, senderName, text, timestamp }) => {
+const Notification = () => {
+  const { messages: quizMessages } = usePubSub("QUIZ");
+
   useEffect(() => {
-    // Check if the received message is a quiz
-    if (text && typeof text === 'object' && text.type === 'quiz') {
-      console.log("Received quiz:", text);
-      
-      toast(
-        <QuizToast 
-          question={text.question}
-          answers={text.answers}
-          correctAnswer={text.correctAnswer}
-          senderName={senderName}
-        />,
-        {
-          position: "bottom-right",
-          theme: "dark",
-          autoClose: 5000,
-          closeOnClick: false,
-          hideProgressBar: false,
-          draggable: false,
-          closeButton: false,
-        }
-      );
+    if (quizMessages && quizMessages.length > 0) {
+      const latestQuiz = quizMessages[quizMessages.length - 1];
+      if (latestQuiz && typeof latestQuiz.message === 'object' && latestQuiz.message.type === 'quiz') {
+        const { question, answers, correctAnswer } = latestQuiz.message;
+        const { senderName } = latestQuiz;
+        
+        toast(
+          <QuizToast 
+            question={question}
+            answers={answers}
+            correctAnswer={correctAnswer}
+            senderName={senderName}
+          />,
+          {
+            position: "bottom-right",
+            theme: "dark",
+            autoClose: 5000,
+            closeOnClick: false,
+            hideProgressBar: false,
+            draggable: false,
+            closeButton: false,
+          }
+        );
+      }
     }
-  }, [text, senderName, senderId, timestamp]);
+  }, [quizMessages]);
 
   return null; 
 };

@@ -7,6 +7,7 @@ import { PresenterView } from "../components/PresenterView";
 import WaitingToJoinScreen from "../components/screens/WaitingToJoinScreen";
 import { useMeetingAppContext } from "../MeetingAppContextDef";
 import { ChatMessages } from "../components/sidebar/ChatPanel";
+import { QuizMessage } from "../components/sidebar/ChatPanel";
 
 export function MeetingContainer({ onMeetingLeave, setIsMeetingLeft }) {
   const { setSelectedMic, setSelectedWebcam, setSelectedSpeaker } = useMeetingAppContext();
@@ -63,7 +64,7 @@ export function MeetingContainer({ onMeetingLeave, setIsMeetingLeft }) {
               </div>
               <SidebarConatiner />
             </div>
-            <ChatMessages listHeight={20} />
+            <QuizMessage />
             <BottomBar setIsMeetingLeft={setIsMeetingLeft} />
           </>
         ) : (

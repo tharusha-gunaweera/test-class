@@ -15,12 +15,7 @@ const ChatMessage = ({ senderId, senderName, message, timestamp }) => {
   
   return (
     <>
-    <Notification 
-        senderId={senderId}
-        senderName={senderName}
-        text={message}
-        timestamp={timestamp}
-      />
+    
     <div
       className={`flex ${localSender ? "justify-end" : "justify-start"} mt-4`}
       style={{
@@ -68,13 +63,35 @@ const ChatMessage = ({ senderId, senderName, message, timestamp }) => {
   );
 };
 
+
+const QuizMessages = ({ senderId, senderName, message, timestamp }) => {
+  const mMeeting = useMeeting();
+  const localParticipantId = mMeeting?.localParticipant?.id;
+
+
+  
+  return (
+    <>
+    <Notification 
+        senderId={senderId}
+        senderName={senderName}
+        text={message}
+        timestamp={timestamp}
+      />
+    </>
+  );
+};
+
+
 const ChatInput = ({ inputHeight }) => {
   const [message, setMessage] = useState("");
   const [question, setQuestion] = useState("");
   const [answers, setAnswers] = useState(["", "", "", ""]);
   const [correctAnswer, setCorrectAnswer] = useState(0);
   const [isQuizMode, setIsQuizMode] = useState(false);
-  const { publish } = usePubSub("CHAT");
+  const { publish: publishChat } = usePubSub("CHAT");
+  const { publish: publishQuiz } = usePubSub("QUIZ");
+  
   const input = useRef();
 
   const handleAnswerChange = (index, value) => {
@@ -92,7 +109,7 @@ const ChatInput = ({ inputHeight }) => {
           correctAnswer,
           type: "quiz"
         };
-        publish(quiz, { persist: true });
+        publishQuiz(quiz, { persist: true });
         
         // Reset form
         setQuestion("");
@@ -103,7 +120,7 @@ const ChatInput = ({ inputHeight }) => {
     } else {
       const messageText = message.trim();
       if (messageText.length > 0) {
-        publish(messageText, { persist: true });
+        publishChat(messageText, { persist: true });
         setMessage("");
       }
     }
@@ -202,7 +219,7 @@ const ChatInput = ({ inputHeight }) => {
 
 export const ChatMessages = ({ listHeight }) => {
   const listRef = useRef();
-  const { messages } = usePubSub("CHAT");
+  const { messages: chatMessages } = usePubSub("CHAT");
 
   const scrollToBottom = (data) => {
     if (!data) {
@@ -214,7 +231,7 @@ export const ChatMessages = ({ listHeight }) => {
 
       if (json_verify(text)) {
         const { type } = JSON.parse(text);
-        if (type === "CHAT") {
+        if (type === "CHAT" ) {
           if (listRef.current) {
             listRef.current.scrollTop = listRef.current.scrollHeight;
           }
@@ -225,15 +242,70 @@ export const ChatMessages = ({ listHeight }) => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [chatMessages]);
 
-  return messages ? (
+  const allMessages = [...(chatMessages || [])].sort((a, b) => 
+    new Date(a.timestamp) - new Date(b.timestamp)
+  );
+
+  return allMessages.length > 0 ? (
     <div ref={listRef} style={{ overflowY: "scroll", height: listHeight }}>
       <div className="p-4">
-        {messages.map((msg, i) => {
+        {allMessages.map((msg, i) => {
           const { senderId, senderName, message, timestamp } = msg;
           return (
             <ChatMessage
+              key={`chat_item_${i}`}
+              {...{ senderId, senderName, message, timestamp }}
+            />
+          );
+        })}
+      </div>
+    </div>
+  ) : (
+    <p>No messages</p>
+  );
+};
+
+
+export const QuizMessage = ({ listHeight }) => {
+  const listRef = useRef();
+  const { messages: quizMessages } = usePubSub("QUIZ");
+
+  const scrollToBottom = (data) => {
+    if (!data) {
+      if (listRef.current) {
+        listRef.current.scrollTop = listRef.current.scrollHeight;
+      }
+    } else {
+      const { text } = data;
+
+      if (json_verify(text)) {
+        const { type } = JSON.parse(text);
+        if ( type === "QUIZ") {
+          if (listRef.current) {
+            listRef.current.scrollTop = listRef.current.scrollHeight;
+          }
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [quizMessages]);
+
+  const allMessages = [ ...(quizMessages || [])].sort((a, b) => 
+    new Date(a.timestamp) - new Date(b.timestamp)
+  );
+
+  return allMessages.length > 0 ? (
+    <div ref={listRef} style={{ overflowY: "scroll", height: listHeight }}>
+      <div className="p-4">
+        {allMessages.map((msg, i) => {
+          const { senderId, senderName, message, timestamp } = msg;
+          return (
+            <QuizMessages
               key={`chat_item_${i}`}
               {...{ senderId, senderName, message, timestamp }}
             />
@@ -252,7 +324,7 @@ export function ChatPanel({ panelHeight }) {
 
   return (
     <div>
-      
+      <ChatMessages listHeight={listHeight} />
       <ChatInput inputHeight={inputHeight} />
     </div>
   );

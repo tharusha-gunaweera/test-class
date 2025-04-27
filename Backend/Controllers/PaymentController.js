@@ -1,5 +1,6 @@
 const { get } = require("mongoose");
 const Payment = require("../Model/PaymentModel");
+const mongoose = require('mongoose');
 
 //Display
 const getAllPayments = async (req, res, next) => {
@@ -58,34 +59,49 @@ const addPayments = async (req, res, next) => {
 //Get ID
 const getById = async (req, res, next) => {
     const id = req.params.id;
-    let payment;
+    
+    // Validate if the ID is a valid MongoDB ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ message: "Invalid payment ID format" });
+    }
 
+    let payment;
     try {
         payment = await Payment.findById(id);
     } catch (err) {
         console.log(err);
+        return res.status(500).json({ message: "Error finding payment", error: err.message });
     }
+    
     if(!payment){
-        return res.status(404).json({message:"Unable to find payment"});
+        return res.status(404).json({message:"Payment not found"});
     }
     return res.status(200).json({ payment });
 }
 
 //Update
 const updatePayment = async (req, res, next) => {
-    const id =req.params.id;
+    const id = req.params.id;
+    
+    // Validate if the ID is a valid MongoDB ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ message: "Invalid payment ID format" });
+    }
+
     const {studentName,studentId,studyingYear,courseName,paymentMonth,cardNumber,expiryDate,cvv,amount} = req.body;
 
     let payment;
     try {
         payment = await Payment.findByIdAndUpdate(id, 
-            {studentName:studentName,studentId:studentId,studyingYear:studyingYear,courseName:courseName,paymentMonth:paymentMonth,cardNumber:cardNumber,expiryDate:expiryDate,cvv:cvv,amount:amount});
-            payments = await payment.save();
+            {studentName,studentId,studyingYear,courseName,paymentMonth,cardNumber,expiryDate,cvv,amount},
+            { new: true, runValidators: true });
     } catch (err) {
         console.log(err);
+        return res.status(500).json({ message: "Error updating payment", error: err.message });
     }
+    
     if(!payment){
-        return res.status(404).json({message:"Unable to Update payment"});
+        return res.status(404).json({message:"Payment not found"});
     }
     return res.status(200).json({ payment });
 }
@@ -93,17 +109,24 @@ const updatePayment = async (req, res, next) => {
 //Delete
 const deletePayment = async (req, res, next) => {
     const id = req.params.id;
-    let payment;
+    
+    // Validate if the ID is a valid MongoDB ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ message: "Invalid payment ID format" });
+    }
 
+    let payment;
     try {
         payment = await Payment.findByIdAndDelete(id);
     } catch (err) {
         console.log(err);
+        return res.status(500).json({ message: "Error deleting payment", error: err.message });
     }
+    
     if(!payment){
-        return res.status(404).json({message:"Unable to Delete payment"});
+        return res.status(404).json({message:"Payment not found"});
     }
-    return res.status(200).json({ payment });
+    return res.status(200).json({ message: "Payment deleted successfully" });
 }
 
 exports.getAllPayments = getAllPayments;

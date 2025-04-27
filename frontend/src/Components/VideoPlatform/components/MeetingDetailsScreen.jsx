@@ -13,14 +13,13 @@ export function MeetingDetailsScreen({
   isCreateMeeting,
   onClickStartMeeting,
 }) {
-  const [meetingId, setMeetingId] = useState("");
+  const [meetingId, setMeetingId] = useState(classId || "");
   const [meetingIdError, setMeetingIdError] = useState(false);
   const [isRegenerating, setIsRegenerating] = useState(false);
   const [isMeetingCreated, setIsMeetingCreated] = useState(false);
   
   console.log("username: ",UserName);
   console.log("Is created",isCreateMeeting);
-  console.log("Class id is",classId);
   console.log("isCreateMeeting type:", typeof isCreateMeeting);
   console.log("isCreateMeeting value:", isCreateMeeting);
 
@@ -126,11 +125,13 @@ export function MeetingDetailsScreen({
       ) : (
         <>
           <input
-            Value={classId}
+            value={meetingId}
+            readOnly
             onChange={(e) => {
               setMeetingId(e.target.value);
+              setMeetingIdError(false);
             }}
-            className=" px-4 py-3 bg-gray-650 rounded-xl text-white w-full text-center"
+            className="hidden px-4 py-3 bg-gray-650 rounded-xl text-white w-full text-center"
           />
           {meetingIdError && (
             <p className="text-xs text-red-600">{`Please enter valid meetingId`}</p>

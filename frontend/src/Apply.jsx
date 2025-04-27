@@ -23,6 +23,9 @@ import LandingPage from './Components/LandingPage';
 import StudentProfile from './Components/Students/studentProfile';
 import TeacherProfile from "./Components/Teacher/teacherProfile";
 import { registerLicense } from '@syncfusion/ej2-base';
+import SalaryForm from "./Components/Admin/SalaryForm";
+import SalaryRecords from "./Components/Admin/SalaryRecords";
+import Payments from './Components/Admin/Payments';
 
 registerLicense("Ngo9BigBOggjHTQxAR8/V1NNaF5cXmpCe0x0R3xbf1x1ZFRMZF1bRHVPIiBoS35Rc0VnW3tec3BTQ2ZbWE10VEBU");
 
@@ -61,6 +64,9 @@ function App() {
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/AdminManageUsers" element={<AdminManageUsers />} />
             <Route path="/admin/classes" element={<AdminDashboard />} />
+            <Route path="/SalaryForm" element={<SalaryForm />} />
+            <Route path="/salary-records" element={<SalaryRecords />} />
+            <Route path="/Payments" element={<Payments />} />
             <Route path="/admin/settings" element={<AdminDashboard />} />
           </Routes>
         </div>

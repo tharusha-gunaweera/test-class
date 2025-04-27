@@ -5,6 +5,8 @@ import {
   AcademicCapIcon,
   UserGroupIcon,
   CogIcon,
+  CreditCardIcon,
+  CurrencyDollarIcon,
 } from "@heroicons/react/outline";
 import logo from "../Logo/LogoV2.jpg";
 
@@ -70,6 +72,38 @@ const Navbar = () => {
             >
               <AcademicCapIcon className="w-5 h-5" />
               Manage Classes
+            </span>
+          )}
+        </NavLink>
+
+        <NavLink
+          to="/SalaryForm"
+          className="w-[300px] justify-center flex items-center gap-3 px-6 py-3 text-sm font-medium font-[Poppins] transition-all text-gray-500 hover:text-blue-500"
+        >
+          {({ isActive }) => (
+            <span
+              className={`flex items-center gap-3 pl-[63px] py-3 w-60 ${
+                isActive ? "text-blue-700 bg-blue-100" : "text-gray-500"
+              }`}
+            >
+              <CurrencyDollarIcon className="w-5 h-5" />
+              Manage Salaries
+            </span>
+          )}
+        </NavLink>
+
+        <NavLink
+          to="/Payments"
+          className="w-[300px] justify-center flex items-center gap-3 px-6 py-3 text-sm font-medium font-[Poppins] transition-all text-gray-500 hover:text-blue-500"
+        >
+          {({ isActive }) => (
+            <span
+              className={`flex items-center gap-3 pl-[63px] py-3 w-60 ${
+                isActive ? "text-blue-700 bg-blue-100" : "text-gray-500"
+              }`}
+            >
+              <CreditCardIcon className="w-5 h-5" />
+              Manage Payments
             </span>
           )}
         </NavLink>

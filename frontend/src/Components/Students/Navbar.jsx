@@ -3,7 +3,8 @@ import {
   HomeIcon,
   ChatIcon,
   AcademicCapIcon,
-  CalendarIcon
+  CalendarIcon,
+  CreditCardIcon
 } from "@heroicons/react/outline";
 import logo from "../Logo/LogoV2.jpg";
 
@@ -94,7 +95,7 @@ const Navbar = () => {
                 isActive ? "text-blue-700 bg-blue-100" : "text-gray-500"
               }`}
             >
-              <AcademicCapIcon className="w-5 h-5" />
+              <CreditCardIcon className="w-5 h-5" />
               Payment
             </span>
           )}

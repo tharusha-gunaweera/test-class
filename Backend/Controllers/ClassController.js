@@ -50,13 +50,30 @@ exports.getClassById = async (req, res) => {
 exports.updateClass = async (req, res) => {
     try {
         const classData = await Class.findById(req.params.id);
-        if (classData) {
-            Object.assign(classData, req.body);
-            const updatedClass = await classData.save();
-            res.json(updatedClass);
-        } else {
-            res.status(404).json({ message: 'Class not found' });
+        if (!classData) {
+            return res.status(404).json({ message: 'Class not found' });
         }
+
+        const updateFields = {
+            teacherID: req.body.teacherID || classData.teacherID,
+            teacherName: req.body.teacherName || classData.teacherName,
+            className: req.body.className || classData.className,
+            subject: req.body.subject || classData.subject,
+            schedule: req.body.schedule || classData.schedule,
+            duration: req.body.duration || classData.duration,
+            room: req.body.room || classData.room,
+            description: req.body.description || classData.description,
+            mcqs: req.body.mcqs || classData.mcqs || []
+        };
+
+        // Update the document
+        const updatedClass = await Class.findByIdAndUpdate(
+            req.params.id,
+            updateFields,
+            { new: true, runValidators: true }
+        );
+
+        res.json(updatedClass);
     } catch (error) {
         res.status(400).json({ message: error.message });
     }

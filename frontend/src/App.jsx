@@ -20,7 +20,7 @@ function App() {
   const [isInitialized, setIsInitialized] = useState(false);
   const [UserName, setUserName] = useState("");
   const [classId, setClassId] = useState("");
-  const [isMeetingCreater, setisMeetingCreater] = useState("");
+  const [isMeetingCreater, setisMeetingCreater] = useState(false);
 
   const isMobile = window.matchMedia(
     "only screen and (max-width: 768px)"

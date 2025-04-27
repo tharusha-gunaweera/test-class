@@ -9,6 +9,7 @@ import TeacherClasses from "./Components/Teacher/ClassManagement";
 import TeacherNav from "./Components/Teacher/Navbar";
 import McqSection from "./Components/Teacher/McqSection";
 import AdminDashboard from "./Components/Admin/AdminDashboard";
+import AdminManageUsers from "./Components/Admin/AdminStudentPanel";
 import Test from "./Components/Students/test"
 import TestTeacher from "./Components/Teacher/UpcommingClasses"
 // import TeacherDashboard from "./Components/Teacher/TeacherDashBoard";
@@ -49,7 +50,7 @@ function App() {
             <Route path="/TeacherTimeTable" element={<TeachersTimeTable />} />
 
             <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/admin/users" element={<AdminDashboard />} />
+            <Route path="/AdminManageUsers" element={<AdminManageUsers />} />
             <Route path="/admin/classes" element={<AdminDashboard />} />
             <Route path="/admin/settings" element={<AdminDashboard />} />
           </Routes>

@@ -177,6 +177,7 @@ const Signup = () => {
       await axios.post("http://localhost:5000/Users", {
         username: String(formData.username),
         email: String(formData.email),
+        isActive: true,
         school: String(formData.school),
         grade: Number(formData.grade),
         address: String(formData.address),

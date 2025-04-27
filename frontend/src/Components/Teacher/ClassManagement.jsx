@@ -313,20 +313,7 @@ const ClassManagement = () => {
                   </div>
                 </div>
                 
-                <div>
-                  <label className="block text-sm font-medium text-indigo-700 mb-1.5" htmlFor="room">
-                    Room
-                  </label>
-                  <input
-                    type="text"
-                    id="room"
-                    name="room"
-                    value={formData.room}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2 text-sm rounded-md border border-indigo-200 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
-                    placeholder="Bldg 3, Rm 205"
-                  />
-                </div>
+                
                 
                 <div>
                   <label className="block text-sm font-medium text-indigo-700 mb-1.5" htmlFor="description">
@@ -337,7 +324,7 @@ const ClassManagement = () => {
                     name="description"
                     value={formData.description}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2 text-sm rounded-md border border-indigo-200 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                    className="w-full h-20 px-4 py-2 text-sm rounded-md border border-indigo-200 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
                     rows="2"
                     placeholder="Additional details..."
                   />

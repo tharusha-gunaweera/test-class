@@ -11,7 +11,15 @@ const MyClasses = () => {
   const [filter, setFilter] = useState('all');
   const [currentTime, setCurrentTime] = useState(new Date());
   const [searchQuery, setSearchQuery] = useState('');
-  const [userName, setUserName] = useState('John Doe'); // Replace with actual user name
+  const [userName, setUserName] = useState(null); // Replace with actual user name
+
+  useEffect(() => {
+    // Get user data from localStorage
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      setUserName(JSON.parse(userData));
+    }
+  }, []);
 
   // Update current time every minute
   useEffect(() => {
@@ -74,6 +82,12 @@ const MyClasses = () => {
     return currentTime >= classStart && currentTime <= classEnd;
   };
 
+  // Check if meeting has started
+  const hasMeetingStarted = (cls) => {
+    if (!cls.room) return false;
+    return true;
+  };
+
   // Filter classes
   const filteredClasses = classes.filter(cls => {
     const paymentMatch = filter === 'all' || 
@@ -91,10 +105,9 @@ const MyClasses = () => {
       <div className="max-w-7xl ml-[250px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col md:flex-row gap-6 h-[calc(100vh-70px)]">
           {/* Class List */}
-          <div className="w-full md:w-1/3 h-full">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 h-full flex flex-col">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-gray-800">My Classes</h2>
+          <div className="w-full md:w-1/3">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 h-full flex flex-col">
+              <div className="p-4 border-b border-gray-200">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                   <input
@@ -102,36 +115,9 @@ const MyClasses = () => {
                     placeholder="Search classes..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
-              </div>
-              
-              <div className="flex space-x-2 mb-4">
-                <button
-                  onClick={() => setFilter('all')}
-                  className={`px-3 py-1 text-sm rounded-full ${
-                    filter === 'all' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'
-                  }`}
-                >
-                  All
-                </button>
-                <button
-                  onClick={() => setFilter('paid')}
-                  className={`px-3 py-1 text-sm rounded-full ${
-                    filter === 'paid' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'
-                  }`}
-                >
-                  Paid
-                </button>
-                <button
-                  onClick={() => setFilter('unpaid')}
-                  className={`px-3 py-1 text-sm rounded-full ${
-                    filter === 'unpaid' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'
-                  }`}
-                >
-                  Unpaid
-                </button>
               </div>
 
               <div className="space-y-3 overflow-y-auto flex-1 pr-2">
@@ -200,7 +186,7 @@ const MyClasses = () => {
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Room</p>
-                      <p className="text-sm font-medium text-gray-800 mt-1">{selectedClass.room || 'Online'}</p>
+                      <p className="text-sm font-medium text-gray-800 mt-1">{selectedClass.room || 'Not started'}</p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Payment Status</p>
@@ -217,33 +203,33 @@ const MyClasses = () => {
                     <div className="p-4">
                       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                         <div className="mb-2 sm:mb-0">
-                          <h3 className="font-medium text-gray-800 text-sm mb-0.5">Meeting Link</h3>
-                          <p className="text-blue-600 text-xs">https://meet.example.com/{selectedClass._id}</p>
+                          <h3 className="font-medium text-gray-800 text-sm mb-0.5">Meeting Status</h3>
+                          <p className="text-blue-600 text-xs">
+                            {hasMeetingStarted(selectedClass) 
+                              ? `Meeting ID: ${selectedClass.room}`
+                              : 'Meeting not started yet'}
+                          </p>
                         </div>
-                        {selectedClass.isPaid && isClassActive(selectedClass) ? (
-                          <Link 
-                            to={`/VideoPlatform?userName=${encodeURIComponent(userName)}&meetingId=${selectedClass._id}`}
-                            className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium py-2 px-4 rounded-md transition w-full sm:w-auto text-center"
-                          >
-                            Join Now
-                          </Link>
-                        ) : selectedClass.isPaid ? (
-                          currentTime < new Date(selectedClass.date + 'T' + selectedClass.startTime + ':00') ? (
-                            <button
-                              className="bg-green-500 hover:bg-green-600 text-white text-xs font-medium py-2 px-4 rounded-md transition w-full sm:w-auto text-center"
-                            >
-                              Not started
-                            </button>
-                          ) : (
-                            <Link
-                              to={`/VideoPlatform?userName=${encodeURIComponent(userName)}&meetingId=${selectedClass._id}&isMeetingCreater=${true}`}
-                              className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium py-2 px-4 rounded-md transition w-full sm:w-auto text-center"
-                            >
-                              Join meeting
-                            </Link>
-                          )
+                        {selectedClass.isPaid ? (
+                            hasMeetingStarted(selectedClass) ? (
+                              <Link 
+                                to={`/VideoPlatform?userName=${encodeURIComponent(userName?.username)}&meetingId=${selectedClass.room}&isMeetingCreater=${false}`}
+                                className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium py-2 px-4 rounded-md transition w-full sm:w-auto text-center"
+                              >
+                                Join Meeting
+                              </Link>
+                            ) : (
+                              <button
+                                disabled
+                                className="bg-gray-300 text-gray-600 text-xs font-medium py-2 px-4 rounded-md transition w-full sm:w-auto text-center cursor-not-allowed"
+                              >
+                                Meeting Not Started
+                              </button>
+                            )
+                          
                         ) : (
                           <button
+                            disabled
                             className="bg-gray-300 text-gray-600 text-xs font-medium py-2 px-4 rounded-md transition w-full sm:w-auto text-center cursor-not-allowed"
                           >
                             Payment Required

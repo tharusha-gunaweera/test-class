@@ -167,26 +167,27 @@ const getById = async(req,res,next) =>{
 }
 
 //update
-
 const updateUsers = async (req, res, next) => {
     const id = req.params.id;
-    const {honorifics,name,gmail,age,address} = req.body;
+    const { isActive } = req.body;
 
-    let users;
-
-    try{
-        users = await User.findByIdAndUpdate(id, {honorifics:honorifics,name:name,gmail:gmail, age:age, address:address});
-
-        users = await users.save();
-    }catch(err){
+    let user;
+    try {
+        user = await User.findByIdAndUpdate(
+            id,
+            { isActive },
+            { new: true }
+        );
+    } catch (err) {
         console.log(err);
+        return res.status(500).json({ message: "Error updating user" });
     }
 
-    if (!users) {
-        return res.status(404).json({ message: "Unable to update user" }); 
+    if (!user) {
+        return res.status(404).json({ message: "User not found" }); 
     }
 
-    return res.status(200).json({ users });
+    return res.status(200).json({ user });
 }
 
 const getByUsername = async (req, res, next) => {

@@ -1,21 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { FaTrash, FaBan, FaSearch, FaUserGraduate, FaCheckCircle, FaTimesCircle, FaLock, FaLockOpen } from 'react-icons/fa';
+import { FaTrash, FaSearch, FaUserGraduate, FaTimesCircle, FaLock, FaLockOpen, FaPlus } from 'react-icons/fa';
 import Navbar from './Navbar';
 import axios from 'axios';
 
 const AdminStudentPanel = () => {
   const [students, setStudents] = useState([]);
+  const [deletedUsers, setDeletedUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newStudent, setNewStudent] = useState({ username: '', email: '', password: '' });
 
-  // Fetch students from backend
   useEffect(() => {
     const fetchStudents = async () => {
       try {
         setIsLoading(true);
         const res = await axios.get('http://localhost:5000/Users');
-        // Filter only users with acclevel = 1 (students)
         const usersData = (res.data.Users || []).filter(user => user.acclevel === 1);
         setStudents(usersData);
         setError(null);
@@ -53,31 +54,98 @@ const AdminStudentPanel = () => {
   };
 
   const handleDelete = async (id) => {
-    try {
-      await axios.delete(`http://localhost:5000/Users/${id}`);
-      setStudents(prev => prev.filter(student => student._id !== id));
-    } catch (error) {
-      console.error('Error deleting student:', error);
-      setError('Failed to delete student');
+    const userToDelete = students.find(student => student._id === id);
+    if (userToDelete && window.confirm(`Are you sure you want to delete ${userToDelete.username}?`)) {
+      try {
+        const response = await axios.delete(`http://localhost:5000/Users/${id}`);
+        if (response.status !== 200) {
+          alert("Error deleting user!");
+          return;
+        }
+        const deletedUserWithTimestamp = {
+          ...userToDelete,
+          deletedAt: new Date().toLocaleString()
+        };
+        setDeletedUsers(prev => [...prev, deletedUserWithTimestamp]);
+        setStudents(prev => prev.filter(student => student._id !== id));
+      } catch (error) {
+        console.error("Error deleting student:", error);
+        setError('Failed to delete student');
+      }
     }
   };
 
-  const filteredStudents = Array.isArray(students) 
-    ? students.filter(student =>
-        student.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        student.email.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : [];
+  const generateCSV = () => {
+    if (deletedUsers.length === 0) {
+      alert("No deleted users to generate a report.");
+      return;
+    }
+
+    try {
+      const headers = "Name,Email,Role,Deleted At\n";
+      const rows = deletedUsers.map(user =>
+        `${user.username},${user.email},Student,${user.deletedAt || new Date().toLocaleString()}`
+      ).join("\n");
+
+      const csvContent = `data:text/csv;charset=utf-8,${headers}${rows}`;
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "deleted_students_report.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      alert("Error generating CSV file.");
+      console.error(error);
+    }
+  };
+
+  const handleAddStudent = async () => {
+    const { username, email, password } = newStudent;
+    if (!username || !email || !password) {
+      alert("All fields are required.");
+      return;
+    }
+    try {
+      const response = await axios.post("http://localhost:5000/Users", {
+        ...newStudent,
+        acclevel: 1,
+        isActive: true
+      });
+      if (response.status === 201) {
+        console.log("New student added:", response.data);
+        // Reset newStudent state after adding
+        setNewStudent({ username: '', email: '', password: '' });
+        setShowAddModal(false); // Close the modal
+        // Fetch students again after adding a new one
+        const res = await axios.get('http://localhost:5000/Users');
+        const usersData = (res.data.Users || []).filter(user => user.acclevel === 1);
+        setStudents(usersData);
+        // Ensure searchQuery stays the same
+        setSearchQuery(''); // Clear or keep the search query
+      }
+    } catch (error) {
+      console.error("Error adding student:", error);
+      setError("Failed to add student");
+    }
+  };
+  
+
+  const filteredStudents = students.filter(student =>
+    student.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    student.email.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-sky-100 p-6">
       <Navbar />
       <div className="ml-[260px] max-w-6xl mx-auto">
-        <div className="flex items-center mb-8">
-          <FaUserGraduate className="text-blue-600 text-3xl mr-3" />
-          <h1 className="text-3xl font-bold text-gray-800">
-            Student Management
-          </h1>
+        <div className="flex justify-between items-center mb-8">
+          <div className="flex items-center">
+            <FaUserGraduate className="text-blue-600 text-3xl mr-3" />
+            <h1 className="text-3xl font-bold text-gray-800">Student Management</h1>
+          </div>
         </div>
 
         {error && (
@@ -106,11 +174,6 @@ const AdminStudentPanel = () => {
           </div>
         ) : filteredStudents.length === 0 ? (
           <div className="bg-white rounded-xl p-8 text-center border border-gray-200 shadow-sm">
-            <img 
-              src="https://cdn-icons-png.flaticon.com/512/4076/4076478.png" 
-              alt="No students" 
-              className="w-24 h-24 mx-auto mb-4 opacity-70"
-            />
             <h3 className="text-xl text-gray-700 font-medium mb-2">No students found</h3>
             <p className="text-gray-500">
               {searchQuery ? 'Try a different search term' : 'No students in the system yet'}
@@ -124,7 +187,7 @@ const AdminStudentPanel = () => {
               <div className="col-span-2">Status</div>
               <div className="col-span-2 text-right">Actions</div>
             </div>
-            
+
             {filteredStudents.map((student) => (
               <div
                 key={student._id}
@@ -140,11 +203,11 @@ const AdminStudentPanel = () => {
                     <p className="text-gray-800 font-medium">{student.username}</p>
                   </div>
                 </div>
-                
+
                 <div className="col-span-4 text-gray-700">
                   {student.email}
                 </div>
-                
+
                 <div className="col-span-2">
                   {!student.isActive ? (
                     <div className="flex items-center">
@@ -158,7 +221,7 @@ const AdminStudentPanel = () => {
                     </div>
                   )}
                 </div>
-                
+
                 <div className="col-span-2 flex justify-end space-x-2">
                   <button
                     onClick={() => handleBlock(student._id)}
@@ -167,7 +230,7 @@ const AdminStudentPanel = () => {
                   >
                     {!student.isActive ? <FaLockOpen /> : <FaLock />}
                   </button>
-                  
+
                   <button
                     onClick={() => handleDelete(student._id)}
                     className="p-2 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition-colors"
@@ -180,13 +243,72 @@ const AdminStudentPanel = () => {
             ))}
           </div>
         )}
-        
+
         {filteredStudents.length > 0 && (
           <div className="mt-4 text-right text-sm text-gray-500">
             Showing {filteredStudents.length} of {students.length} students
           </div>
         )}
+
+        <div className="mt-6 flex justify-center">
+          <button
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
+            onClick={generateCSV}
+          >
+            Download Deleted Users Report
+          </button>
+        </div>
       </div>
+
+      {/* Modal for adding student */}
+      {showAddModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-xl shadow-lg w-full max-w-md">
+            <h2 className="text-xl font-semibold mb-4">Add New Student</h2>
+            <div className="mb-4">
+              <input
+                type="text"
+                placeholder="Username"
+                className="w-full border px-3 py-2 rounded"
+                value={newStudent.username}
+                onChange={(e) => setNewStudent({ ...newStudent, username: e.target.value })}
+              />
+            </div>
+            <div className="mb-4">
+              <input
+                type="email"
+                placeholder="Email"
+                className="w-full border px-3 py-2 rounded"
+                value={newStudent.email}
+                onChange={(e) => setNewStudent({ ...newStudent, email: e.target.value })}
+              />
+            </div>
+            <div className="mb-4">
+              <input
+                type="password"
+                placeholder="Password"
+                className="w-full border px-3 py-2 rounded"
+                value={newStudent.password}
+                onChange={(e) => setNewStudent({ ...newStudent, password: e.target.value })}
+              />
+            </div>
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={() => setShowAddModal(false)}
+                className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAddStudent}
+                className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
+              >
+                Add Student
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

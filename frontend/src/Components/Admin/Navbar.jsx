@@ -61,7 +61,7 @@ const Navbar = () => {
         </NavLink>
 
         <NavLink
-          to="/admin/classes"
+          to="/AdminTeacherPanel"
           className="w-[300px] justify-center flex items-center gap-3 px-6 py-3 text-sm font-medium font-[Poppins] transition-all text-gray-500 hover:text-blue-500"
         >
           {({ isActive }) => (
@@ -71,7 +71,7 @@ const Navbar = () => {
               }`}
             >
               <AcademicCapIcon className="w-5 h-5" />
-              Manage Classes
+              Manage Teachers
             </span>
           )}
         </NavLink>

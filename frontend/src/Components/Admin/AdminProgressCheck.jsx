@@ -3,6 +3,7 @@ import { Pie } from 'react-chartjs-2';
 import Navbar from './Navbar';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import axios from 'axios';
+import { FaTrash } from 'react-icons/fa';
 
 // Register ChartJS components
 ChartJS.register(ArcElement, Tooltip, Legend);
@@ -13,6 +14,7 @@ const UserAnalyticsDashboard = () => {
   const [userProgress, setUserProgress] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -60,6 +62,26 @@ const UserAnalyticsDashboard = () => {
 
     fetchUserProgress();
   }, [selectedUser]);
+
+  const handleDeleteProgress = async () => {
+    if (!selectedUser || !userProgress) return;
+
+    try {
+      await axios.delete(`http://localhost:5000/ProgressRouter/${userProgress._id}`);
+      setUserProgress(null);
+      setShowDeleteConfirm(false);
+      // Refresh the progress data
+      const response = await axios.get(`http://localhost:5000/ProgressRouter/user/${selectedUser._id}`);
+      if (response.data) {
+        setUserProgress(response.data);
+      } else {
+        setUserProgress(null);
+      }
+    } catch (err) {
+      console.error('Error deleting progress:', err);
+      setError('Failed to delete progress');
+    }
+  };
 
   // Data for the pie chart
   const chartData = userProgress ? {
@@ -180,12 +202,48 @@ const UserAnalyticsDashboard = () => {
       {/* Right Section - Pie Chart */}
       <div className="w-1/3 p-8">
         <div className="bg-white rounded-lg shadow p-6 h-full">
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold text-gray-800">User Analytics</h2>
-            <p className="text-gray-600 mt-1">
-              Response statistics for <span className="font-semibold text-blue-600">{selectedUser?.username || 'No user selected'}</span>
-            </p>
+          <div className="mb-6 flex justify-between items-center">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-800">User Analytics</h2>
+              <p className="text-gray-600 mt-1">
+                Response statistics for <span className="font-semibold text-blue-600">{selectedUser?.username || 'No user selected'}</span>
+              </p>
+            </div>
+            {userProgress && (
+              <button
+                onClick={() => setShowDeleteConfirm(true)}
+                className="p-2 text-red-500 hover:text-red-700 transition-colors"
+                title="Delete Progress"
+              >
+                <FaTrash className="w-5 h-5" />
+              </button>
+            )}
           </div>
+
+          {showDeleteConfirm && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Confirm Delete</h3>
+                <p className="text-gray-600 mb-6">
+                  Are you sure you want to delete the progress data for {selectedUser?.username}? This action cannot be undone.
+                </p>
+                <div className="flex justify-end space-x-4">
+                  <button
+                    onClick={() => setShowDeleteConfirm(false)}
+                    className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleDeleteProgress}
+                    className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           {selectedUser && userProgress ? (
             <div className="flex flex-col items-center">

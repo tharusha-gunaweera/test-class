@@ -180,6 +180,7 @@ export function SidebarConatiner({ height, sideBarContainerWidth,classId }) {
         panelHeaderPadding={panelHeaderPadding}
         panelPadding={panelPadding}
         handleClose={handleClose}
+        classId={classId}
       />
     )
   ) : (

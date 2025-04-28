@@ -79,6 +79,14 @@ const ClassManagement = () => {
   };
 
   const handleDateTimeChange = (e) => {
+    const selectedDate = new Date(e.target.value);
+    const currentDate = new Date();
+    
+    if (selectedDate < currentDate) {
+      alert('Schedule cannot be set to a time in the past');
+      return;
+    }
+    
     setSelectedDateTime(e.target.value);
     if (e.target.value) {
       const date = new Date(e.target.value);

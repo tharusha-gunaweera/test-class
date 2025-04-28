@@ -6,6 +6,7 @@ import McqSection from'./McqSection';
 const ClassManagement = () => {
   // Class Management State
   const [classes, setClasses] = useState([]);
+  const [deletedClasses, setDeletedClasses] = useState([]);
   const [formData, setFormData] = useState({
     teacherID:'',
     teacherName:'',
@@ -49,8 +50,26 @@ const ClassManagement = () => {
   };
 
   // Class Management Handlers
+  const validateInput = (value, fieldName) => {
+    const specialSymbolsRegex = /^[!@#$%^&*(),.?":{}|<>\/\\]/;
+    if (specialSymbolsRegex.test(value)) {
+      return `${fieldName} cannot start with special symbols`;
+    }
+    return "";
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    
+    // Validate input for text fields
+    if (name === 'className' || name === 'subject' || name === 'description') {
+      const error = validateInput(value, name.charAt(0).toUpperCase() + name.slice(1));
+      if (error) {
+        alert(error);
+        return;
+      }
+    }
+
     setFormData(prev => ({
       ...prev,
       teacherID: user?._id,
@@ -138,11 +157,51 @@ const ClassManagement = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this class?')) {
       try {
-        await axios.delete(`http://localhost:5000/Classes/${id}`);
-        setClasses(classes.filter(cls => cls._id !== id));
+        const classToDelete = classes.find(cls => cls._id === id);
+        if (classToDelete) {
+          await axios.delete(`http://localhost:5000/Classes/${id}`);
+          setClasses(classes.filter(cls => cls._id !== id));
+          
+          // Add to deleted classes with timestamp
+          setDeletedClasses(prev => [...prev, {
+            ...classToDelete,
+            deletedAt: new Date().toLocaleString()
+          }]);
+        }
       } catch (error) {
         console.error('Error deleting class:', error);
       }
+    }
+  };
+
+  const generateCSV = () => {
+    if (deletedClasses.length === 0) {
+      alert('No deleted classes to generate a report.');
+      return;
+    }
+
+    try {
+      const headers = 'Class Name,Subject,Schedule,Duration,Teacher,Deleted At\n';
+      const rows = deletedClasses
+        .map(
+          (cls) =>
+            `${cls.className},${cls.subject},${cls.schedule},${cls.duration} mins,${cls.teacherName},${
+              cls.deletedAt || new Date().toLocaleString()
+            }`
+        )
+        .join('\n');
+
+      const csvContent = `data:text/csv;charset=utf-8,${headers}${rows}`;
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement('a');
+      link.setAttribute('href', encodedUri);
+      link.setAttribute('download', 'deleted_classes_report.csv');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      alert('Error generating CSV file.');
+      console.error(error);
     }
   };
 
@@ -371,28 +430,36 @@ const ClassManagement = () => {
                 <h2 className="text-lg font-semibold text-indigo-700">
                   Your Classes
                 </h2>
-                <div className="relative w-full sm:w-52">
-                  <input
-                    type="text"
-                    placeholder="Search..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-4 pr-10 py-2 text-sm rounded-md border border-indigo-200 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
-                  />
-                  <svg
-                    className="absolute right-3 top-2 h-4 w-4 text-indigo-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
+                <div className="flex gap-3">
+                  <button
+                    onClick={generateCSV}
+                    className="px-4 py-2 bg-red-100 text-red-600 rounded-md text-sm font-medium hover:bg-red-200 transition"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    Download Deleted Classes Report
+                  </button>
+                  <div className="relative w-full sm:w-52">
+                    <input
+                      type="text"
+                      placeholder="Search..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="w-full pl-4 pr-10 py-2 text-sm rounded-md border border-indigo-200 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
                     />
-                  </svg>
+                    <svg
+                      className="absolute right-3 top-2 h-4 w-4 text-indigo-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                      />
+                    </svg>
+                  </div>
                 </div>
               </div>
               

@@ -89,7 +89,7 @@ const Navbar = () => {
               }`}
             >
               <AcademicCapIcon className="w-5 h-5" />
-              Upcomming casses
+              Upcomming classes
             </span>
           )}
         </NavLink>

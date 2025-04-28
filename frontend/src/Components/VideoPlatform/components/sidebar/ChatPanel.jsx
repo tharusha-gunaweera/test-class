@@ -222,7 +222,7 @@ export const ChatMessages = ({ listHeight }) => {
 
   return  (
     <div ref={listRef} style={{ overflowY: "scroll", height: listHeight }}>
-      <div className="p-4 h-[300px] w-[300px]">
+      <div className="p-4 h-[550px] w-[300px]">
         {allMessages.map((msg, i) => {
           const { senderId, senderName, message, timestamp } = msg;
           return (

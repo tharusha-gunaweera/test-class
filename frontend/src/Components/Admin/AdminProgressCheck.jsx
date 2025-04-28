@@ -12,78 +12,78 @@ const UserAnalyticsDashboard = () => {
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [userProgress, setUserProgress] = useState(null);
+  const [userProgressData, setUserProgressData] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
+  // Fetch users and their progress data on component mount
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchUsersAndProgress = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/Users');
-        if (response.data && response.data.Users) {
-          setUsers(response.data.Users);
-          if (response.data.Users.length > 0) {
-            setSelectedUser(response.data.Users[0]);
+        // Fetch all users
+        const usersResponse = await axios.get('http://localhost:5000/Users');
+        const usersData = usersResponse.data.Users || [];
+        setUsers(usersData);
+
+        // Fetch progress for all users in parallel
+        const progressPromises = usersData.map(user =>
+          axios.get(`http://localhost:5000/ProgressRouter/user/${user._id}`)
+            .then(res => ({ userId: user._id, progress: res.data }))
+            .catch(() => ({ userId: user._id, progress: null }))
+        );
+        const progressResults = await Promise.all(progressPromises);
+        const progressMap = progressResults.reduce((acc, { userId, progress }) => {
+          if (progress) {
+            acc[userId] = progress;
           }
+          return acc;
+        }, {});
+        setUserProgressData(progressMap);
+
+        // Set initial selected user and their progress
+        if (usersData.length > 0) {
+          setSelectedUser(usersData[0]);
+          setUserProgress(progressMap[usersData[0]._id] || null);
         }
       } catch (err) {
-        setError('Failed to fetch users');
-        console.error('Error fetching users:', err);
+        setError('Failed to fetch users or progress');
+        console.error('Error:', err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchUsers();
+    fetchUsersAndProgress();
   }, []);
 
-  useEffect(() => {
-    const fetchUserProgress = async () => {
-      if (!selectedUser) return;
-      
-      try {
-        console.log('Fetching progress for user:', selectedUser._id);
-        const response = await axios.get(`http://localhost:5000/ProgressRouter/user/${selectedUser._id}`);
-        console.log('Progress API Response:', response.data);
-        
-        if (response.data) {
-          setUserProgress(response.data);
-          console.log('Progress data set:', response.data);
-        } else {
-          console.log('No progress data found');
-          setUserProgress(null);
-        }
-      } catch (err) {
-        console.error('Error fetching user progress:', err);
-        console.error('Error details:', err.response?.data);
-        setUserProgress(null);
-      }
-    };
+  // Handle user selection
+  const handleUserSelect = (user) => {
+    setSelectedUser(user);
+    setUserProgress(userProgressData[user._id] || null);
+  };
 
-    fetchUserProgress();
-  }, [selectedUser]);
-
+  // Handle progress deletion
   const handleDeleteProgress = async () => {
     if (!selectedUser || !userProgress) return;
 
     try {
       await axios.delete(`http://localhost:5000/ProgressRouter/${userProgress._id}`);
+      // Update userProgressData by removing the deleted progress
+      setUserProgressData(prev => {
+        const newData = { ...prev };
+        delete newData[selectedUser._id];
+        return newData;
+      });
       setUserProgress(null);
       setShowDeleteConfirm(false);
-      // Refresh the progress data
-      const response = await axios.get(`http://localhost:5000/ProgressRouter/user/${selectedUser._id}`);
-      if (response.data) {
-        setUserProgress(response.data);
-      } else {
-        setUserProgress(null);
-      }
     } catch (err) {
       console.error('Error deleting progress:', err);
       setError('Failed to delete progress');
     }
   };
 
-  // Data for the pie chart
+  // Pie chart data
   const chartData = userProgress ? {
     labels: ['Correct Answers', 'Wrong Answers', 'Unanswered'],
     datasets: [
@@ -93,39 +93,22 @@ const UserAnalyticsDashboard = () => {
           userProgress.orangeFlagCount || 0,
           userProgress.redFlagCount || 0
         ],
-        backgroundColor: [
-          '#10B981', // green
-          '#F59E0B', // orange
-          '#EF4444', // red
-        ],
-        borderColor: [
-          '#047857', // dark green
-          '#B45309', // dark orange
-          '#B91C1C', // dark red
-        ],
+        backgroundColor: ['#10B981', '#F59E0B', '#EF4444'],
+        borderColor: ['#047857', '#B45309', '#B91C1C'],
         borderWidth: 1,
       },
     ],
   } : null;
 
-  console.log('Current userProgress:', userProgress);
-  console.log('Current chartData:', chartData);
-
   const chartOptions = {
     responsive: true,
     plugins: {
-      legend: {
-        position: 'bottom',
-      },
+      legend: { position: 'bottom' },
       tooltip: {
         callbacks: {
-          label: function(context) {
-            const label = context.label || '';
-            const value = context.raw || 0;
-            return `${label}: ${value}`;
-          }
-        }
-      }
+          label: (context) => `${context.label}: ${context.raw}`,
+        },
+      },
     },
   };
 
@@ -165,25 +148,25 @@ const UserAnalyticsDashboard = () => {
         <div className="flex-1 overflow-y-auto">
           <ul className="divide-y divide-gray-200">
             {users.map((user) => (
-              <li 
+              <li
                 key={user._id}
                 className={`p-4 hover:bg-gray-50 cursor-pointer transition-colors ${
                   selectedUser?._id === user._id ? 'bg-blue-50' : ''
                 }`}
-                onClick={() => setSelectedUser(user)}
+                onClick={() => handleUserSelect(user)}
               >
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="font-medium text-gray-900">{user.username}</p>
                     <div className="flex space-x-2 mt-1">
                       <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
-                        {userProgress?.greenFlagCount || 0} Correct
+                        {userProgressData[user._id]?.greenFlagCount || 0} Correct
                       </span>
                       <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-orange-100 text-orange-800">
-                        {userProgress?.orangeFlagCount || 0} Wrong
+                        {userProgressData[user._id]?.orangeFlagCount || 0} Wrong
                       </span>
                       <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
-                        {userProgress?.redFlagCount || 0} Unanswered
+                        {userProgressData[user._id]?.redFlagCount || 0} Unanswered
                       </span>
                     </div>
                   </div>
@@ -250,7 +233,6 @@ const UserAnalyticsDashboard = () => {
               <div className="w-full max-w-md h-80">
                 <Pie data={chartData} options={chartOptions} />
               </div>
-
               <div className="mt-8 w-full max-w-md">
                 <h3 className="text-lg font-medium text-gray-900 mb-4">Detailed Breakdown</h3>
                 <div className="space-y-3">

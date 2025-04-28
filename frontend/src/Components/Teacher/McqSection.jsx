@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { FiEdit, FiTrash2, FiSearch, FiPlus } from 'react-icons/fi';
+import { FiEdit, FiTrash2, FiSearch, FiPlus, FiDownload } from 'react-icons/fi';
 import axios from "axios";
 import Navbar from "./Navbar";
 import EditForm from './EditForm';
 import AddMcqForm from './AddMcqForm';
+import EditMcqForm from './EditMcqForm';
 
 function McqSection({ classId, className, onBack }) {
   const [mcqs, setMcqs] = useState([]);
+  const [deletedMcqs, setDeletedMcqs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -36,7 +38,9 @@ function McqSection({ classId, className, onBack }) {
     mcq.question.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleEditClick = (mcqId) => setEditingMcqId(mcqId);
+  const handleEditClick = (mcqId) => {
+    setEditingMcqId(mcqId);
+  };
 
   const handleAddClick = () => setShowAddForm(true);
   const handleCancelAdd = () => setShowAddForm(false);
@@ -72,6 +76,16 @@ function McqSection({ classId, className, onBack }) {
   const handleDeleteMcq = async (mcqId) => {
     try {
       const classData = await axios.get(`http://localhost:5000/Classes/${classId}`);
+      const mcqToDelete = classData.data.mcqs.find(mcq => mcq._id === mcqId);
+      
+      // Add the deleted MCQ to the deletedMcqs array
+      if (mcqToDelete) {
+        setDeletedMcqs(prev => [...prev, {
+          ...mcqToDelete,
+          deletedAt: new Date().toLocaleString()
+        }]);
+      }
+
       const updatedMcqs = classData.data.mcqs.filter(mcq => mcq._id !== mcqId);
       
       await axios.put(`http://localhost:5000/Classes/${classId}`, {
@@ -82,6 +96,58 @@ function McqSection({ classId, className, onBack }) {
       await fetchMcqs();
     } catch (err) {
       setError(err.response?.data?.message || err.message);
+    }
+  };
+
+  const handleEditMcq = async (updatedMcq) => {
+    try {
+      const classData = await axios.get(`http://localhost:5000/Classes/${classId}`);
+      const updatedMcqs = classData.data.mcqs.map(mcq => 
+        mcq._id === editingMcqId ? { ...mcq, ...updatedMcq } : mcq
+      );
+      
+      await axios.put(`http://localhost:5000/Classes/${classId}`, {
+        ...classData.data,
+        mcqs: updatedMcqs
+      });
+      
+      await fetchMcqs();
+      setEditingMcqId(null);
+    } catch (err) {
+      setError(err.response?.data?.message || err.message);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingMcqId(null);
+  };
+
+  const downloadDeletedMcqsReport = () => {
+    if (deletedMcqs.length === 0) {
+      alert('No deleted MCQs to generate a report.');
+      return;
+    }
+
+    try {
+      const headers = 'Question,Options,Correct Answer,Deleted At\n';
+      const rows = deletedMcqs
+        .map(
+          (mcq) =>
+            `${mcq.question},"${mcq.options.join(';')}",${mcq.correctAnswer},${mcq.deletedAt}`
+        )
+        .join('\n');
+
+      const csvContent = `data:text/csv;charset=utf-8,${headers}${rows}`;
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement('a');
+      link.setAttribute('href', encodedUri);
+      link.setAttribute('download', 'deleted_mcqs_report.csv');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      alert('Error generating CSV file.');
+      console.error(error);
     }
   };
 
@@ -129,6 +195,13 @@ function McqSection({ classId, className, onBack }) {
               <FiPlus className="mr-2" />
               Add MCQ
             </button>
+            <button
+              onClick={downloadDeletedMcqsReport}
+              className="flex items-center bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
+            >
+              <FiDownload className="mr-2" />
+              Download Report
+            </button>
           </div>
         </div>
 
@@ -137,6 +210,14 @@ function McqSection({ classId, className, onBack }) {
             classId={classId}
             onSave={handleAddMcq}
             onCancel={handleCancelAdd}
+          />
+        )}
+
+        {editingMcqId && (
+          <EditMcqForm
+            mcq={mcqs.find(mcq => mcq._id === editingMcqId)}
+            onSave={handleEditMcq}
+            onCancel={handleCancelEdit}
           />
         )}
 

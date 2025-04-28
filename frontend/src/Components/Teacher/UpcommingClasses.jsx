@@ -8,35 +8,54 @@ const UpcommingClasses = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Get user data from localStorage
     const userData = localStorage.getItem('user');
     if (userData) {
-      setUser(JSON.parse(userData));
+      try {
+        setUser(JSON.parse(userData));
+      } catch (err) {
+        console.error('Error parsing user data:', err);
+        setError('Error loading user data');
+      }
     }
   }, []);
 
   const loadClasses = async () => {
     try {
+      setIsLoading(true);
+      setError(null);
       const response = await axios.get('http://localhost:5000/Classes');
-      // Transform the data to match the required format
-      const transformedClasses = response.data.map(cls => ({
-        id: cls._id,
-        lectureTopic: cls.className,
-        description: cls.description || 'No description available',
-        startDate: new Date(cls.schedule),
-        duration: `${cls.duration} mins`,
-        instructor: cls.teacherName,
-        subject: cls.subject,
-        room: cls.room || 'Online'
-      }));
-      // Sort classes by start date
+      
+      if (!response.data || !Array.isArray(response.data)) {
+        throw new Error('Invalid response format');
+      }
+
+      const transformedClasses = response.data.map(cls => {
+        try {
+          return {
+            id: cls._id || '',
+            lectureTopic: cls.className || 'Untitled Class',
+            description: cls.description || 'No description available',
+            startDate: cls.schedule ? new Date(cls.schedule) : new Date(),
+            duration: cls.duration ? `${cls.duration} mins` : 'Duration not specified',
+            instructor: cls.teacherName || 'Instructor not specified',
+            subject: cls.subject || 'Subject not specified',
+            room: cls.room || 'Online'
+          };
+        } catch (err) {
+          console.error('Error transforming class data:', err);
+          return null;
+        }
+      }).filter(Boolean); // Remove any null entries from transformation errors
+
       const sortedClasses = transformedClasses.sort((a, b) => a.startDate - b.startDate);
       setClasses(sortedClasses);
-      setIsLoading(false);
     } catch (error) {
       console.error('Error loading classes:', error);
+      setError('Failed to load classes. Please try again later.');
+    } finally {
       setIsLoading(false);
     }
   };
@@ -45,23 +64,37 @@ const UpcommingClasses = () => {
     loadClasses();
   }, []);
 
-  const filteredClasses = classes.filter(
-    (cls) =>
-      cls.lectureTopic.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      cls.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      cls.instructor.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      cls.subject.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredClasses = classes.filter((cls) => {
+    if (!searchTerm.trim()) return true;
+    
+    const searchTermLower = searchTerm.toLowerCase();
+    const searchableFields = [
+      cls.lectureTopic,
+      cls.description,
+      cls.instructor,
+      cls.subject,
+      cls.room
+    ];
+
+    return searchableFields.some(field => 
+      field && field.toString().toLowerCase().includes(searchTermLower)
+    );
+  });
 
   const formatDate = (date) => {
-    return date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+    try {
+      return date.toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    } catch (err) {
+      console.error('Error formatting date:', err);
+      return 'Invalid date';
+    }
   };
 
   return (
@@ -72,12 +105,17 @@ const UpcommingClasses = () => {
       <div className="flex-1 p-8">
         <h1 className="text-3xl font-bold text-gray-800 mb-6">Upcoming Classes</h1>
 
-        {/* Search Bar */}
+        {error && (
+          <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+            {error}
+          </div>
+        )}
+
         <div className="mb-6">
           <div className="relative max-w-md">
             <input
               type="text"
-              placeholder="Search classes by topic, description, or instructor..."
+              placeholder="Search classes by topic, description, instructor, subject, or room..."
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -99,17 +137,17 @@ const UpcommingClasses = () => {
           </div>
         </div>
 
-        {/* Loading State */}
         {isLoading ? (
           <div className="flex justify-center items-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
           </div>
         ) : (
-          /* Class List */
           <div className="space-y-4">
             {filteredClasses.length === 0 ? (
               <div className="text-center py-10">
-                <p className="text-gray-500 text-lg">No classes found matching your search.</p>
+                <p className="text-gray-500 text-lg">
+                  {searchTerm ? 'No classes found matching your search.' : 'No upcoming classes available.'}
+                </p>
               </div>
             ) : (
               filteredClasses.map((cls) => (

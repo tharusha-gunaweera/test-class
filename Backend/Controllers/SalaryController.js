@@ -3,7 +3,7 @@ const Salary = require('../Model/SalaryModel');
 // Calculate and create new salary record
 exports.calculateSalary = async (req, res) => {
     try {
-        const { teacherName, teachingSubject, teachingYear, totalAmount, instituteCut } = req.body;
+        const { teacherName, teachingSubject, teachingYear, totalAmount, instituteCut, bankName, accountNumber } = req.body;
         
         // Calculate the final salary
         const cutAmount = (totalAmount * instituteCut) / 100;
@@ -15,7 +15,9 @@ exports.calculateSalary = async (req, res) => {
             teachingYear,
             totalAmount,
             instituteCut,
-            calculatedSalary
+            calculatedSalary,
+            bankName,
+            accountNumber
         });
 
         const savedSalary = await newSalary.save();
@@ -39,7 +41,7 @@ exports.getAllSalaries = async (req, res) => {
 exports.updateSalary = async (req, res) => {
     try {
         const { id } = req.params;
-        const { teacherName, teachingSubject, teachingYear, totalAmount, instituteCut } = req.body;
+        const { teacherName, teachingSubject, teachingYear, totalAmount, instituteCut, bankName, accountNumber } = req.body;
 
         // Recalculate the salary
         const cutAmount = (totalAmount * instituteCut) / 100;
@@ -53,7 +55,9 @@ exports.updateSalary = async (req, res) => {
                 teachingYear,
                 totalAmount,
                 instituteCut,
-                calculatedSalary
+                calculatedSalary,
+                bankName,
+                accountNumber
             },
             { new: true }
         );

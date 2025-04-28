@@ -9,21 +9,64 @@ const SalaryForm = () => {
         teachingSubject: '',
         teachingYear: '',
         totalAmount: '',
-        instituteCut: ''
+        instituteCut: '',
+        bankName: '',
+        accountNumber: ''
     });
     const [calculatedSalary, setCalculatedSalary] = useState(null);
     const [error, setError] = useState('');
+    const [nameError, setNameError] = useState('');
+    const [subjectError, setSubjectError] = useState('');
+    const [amountError, setAmountError] = useState('');
     const navigate = useNavigate();
 
     const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value
-        });
+        const { name, value } = e.target;
+        
+        if (name === 'teacherName') {
+            if (/^[a-zA-Z\s]*$/.test(value)) {
+                setNameError('');
+                setFormData({
+                    ...formData,
+                    [name]: value
+                });
+            } else {
+                setNameError('Teacher name can only contain letters and spaces');
+            }
+        } else if (name === 'teachingSubject') {
+            if (/^[a-zA-Z\s]*$/.test(value)) {
+                setSubjectError('');
+                setFormData({
+                    ...formData,
+                    [name]: value
+                });
+            } else {
+                setSubjectError('Subject can only contain letters and spaces');
+            }
+        } else if (name === 'totalAmount') {
+            if (/^\d*\.?\d*$/.test(value)) {
+                setAmountError('');
+                setFormData({
+                    ...formData,
+                    [name]: value
+                });
+            } else {
+                setAmountError('Total amount can only contain numbers and one decimal point');
+            }
+        } else {
+            setFormData({
+                ...formData,
+                [name]: value
+            });
+        }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (nameError || subjectError || amountError) {
+            setError('Please fix the validation errors before submitting');
+            return;
+        }
         try {
             const response = await axios.post('http://localhost:5000/api/salary/calculate', {
                 ...formData,
@@ -57,9 +100,12 @@ const SalaryForm = () => {
                             value={formData.teacherName}
                             onChange={handleChange}
                             required
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200"
+                            className={`w-full px-4 py-2 border ${nameError ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200`}
                             placeholder="Enter teacher's name"
                         />
+                        {nameError && (
+                            <p className="mt-1 text-sm text-red-600">{nameError}</p>
+                        )}
                     </div>
 
                     <div>
@@ -70,9 +116,12 @@ const SalaryForm = () => {
                             value={formData.teachingSubject}
                             onChange={handleChange}
                             required
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200"
+                            className={`w-full px-4 py-2 border ${subjectError ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200`}
                             placeholder="Enter subject"
                         />
+                        {subjectError && (
+                            <p className="mt-1 text-sm text-red-600">{subjectError}</p>
+                        )}
                     </div>
 
                     <div>
@@ -91,14 +140,17 @@ const SalaryForm = () => {
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Total Amount (LKR)</label>
                         <input
-                            type="number"
+                            type="text"
                             name="totalAmount"
                             value={formData.totalAmount}
                             onChange={handleChange}
                             required
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200"
+                            className={`w-full px-4 py-2 border ${amountError ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200`}
                             placeholder="Enter total amount"
                         />
+                        {amountError && (
+                            <p className="mt-1 text-sm text-red-600">{amountError}</p>
+                        )}
                     </div>
 
                     <div className="md:col-span-2">
@@ -111,6 +163,37 @@ const SalaryForm = () => {
                             required
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200"
                             placeholder="Enter institute cut percentage"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Bank Name</label>
+                        <select
+                            name="bankName"
+                            value={formData.bankName}
+                            onChange={handleChange}
+                            required
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200"
+                        >
+                            <option value="">Select a bank</option>
+                            <option value="Bank of Ceylon">Bank of Ceylon</option>
+                            <option value="Sampath Bank">Sampath Bank</option>
+                            <option value="Commercial Bank">Commercial Bank</option>
+                            <option value="HNB">HNB</option>
+                            <option value="Peoples Bank">People's Bank</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Account Number</label>
+                        <input
+                            type="text"
+                            name="accountNumber"
+                            value={formData.accountNumber}
+                            onChange={handleChange}
+                            required
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200"
+                            placeholder="Enter account number"
                         />
                     </div>
                 </div>

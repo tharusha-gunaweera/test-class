@@ -6,7 +6,18 @@ import Navbar from './Navbar';
 const SalaryRecords = () => {
     const [salaries, setSalaries] = useState([]);
     const [editingId, setEditingId] = useState(null);
-    const [editForm, setEditForm] = useState({});
+    const [editForm, setEditForm] = useState({
+        teacherName: '',
+        teachingSubject: '',
+        teachingYear: '',
+        totalAmount: '',
+        instituteCut: '',
+        bankName: '',
+        accountNumber: ''
+    });
+    const [nameError, setNameError] = useState('');
+    const [subjectError, setSubjectError] = useState('');
+    const [amountError, setAmountError] = useState('');
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -40,11 +51,60 @@ const SalaryRecords = () => {
             teachingSubject: salary.teachingSubject,
             teachingYear: salary.teachingYear,
             totalAmount: salary.totalAmount,
-            instituteCut: salary.instituteCut
+            instituteCut: salary.instituteCut,
+            bankName: salary.bankName,
+            accountNumber: salary.accountNumber
         });
     };
 
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        
+        if (name === 'teacherName') {
+            // Only allow letters and spaces
+            if (/^[a-zA-Z\s]*$/.test(value)) {
+                setNameError('');
+                setEditForm({
+                    ...editForm,
+                    [name]: value
+                });
+            } else {
+                setNameError('Teacher name can only contain letters and spaces');
+            }
+        } else if (name === 'teachingSubject') {
+            // Only allow letters and spaces
+            if (/^[a-zA-Z\s]*$/.test(value)) {
+                setSubjectError('');
+                setEditForm({
+                    ...editForm,
+                    [name]: value
+                });
+            } else {
+                setSubjectError('Subject can only contain letters and spaces');
+            }
+        } else if (name === 'totalAmount') {
+            // Only allow numbers and one decimal point
+            if (/^\d*\.?\d*$/.test(value)) {
+                setAmountError('');
+                setEditForm({
+                    ...editForm,
+                    [name]: value
+                });
+            } else {
+                setAmountError('Total amount can only contain numbers and one decimal point');
+            }
+        } else {
+            setEditForm({
+                ...editForm,
+                [name]: value
+            });
+        }
+    };
+
     const handleUpdate = async (id) => {
+        if (nameError || subjectError || amountError) {
+            return;
+        }
         try {
             const response = await axios.put(`http://localhost:5000/api/salary/${id}`, {
                 ...editForm,
@@ -61,15 +121,34 @@ const SalaryRecords = () => {
         }
     };
 
-    const handleInputChange = (e) => {
-        setEditForm({
-            ...editForm,
-            [e.target.name]: e.target.value
-        });
-    };
-
     const handleBackToCalculator = () => {
         navigate('/SalaryForm');
+    };
+
+    const generateCSV = () => {
+        if (salaries.length === 0) {
+            alert("No salary records to generate a report.");
+            return;
+        }
+
+        try {
+            const headers = "Teacher Name,Teaching Subject,Teaching Year,Total Amount,Institute Cut,Final Salary,Bank Name,Account Number\n";
+            const rows = salaries.map(salary =>
+                `${salary.teacherName},${salary.teachingSubject},${salary.teachingYear},${salary.totalAmount},${salary.instituteCut}%,${salary.calculatedSalary},${salary.bankName},${salary.accountNumber}`
+            ).join("\n");
+
+            const csvContent = `data:text/csv;charset=utf-8,${headers}${rows}`;
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "salary_records_report.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } catch (error) {
+            alert("Error generating CSV file.");
+            console.error(error);
+        }
     };
 
     return (
@@ -77,12 +156,20 @@ const SalaryRecords = () => {
             <Navbar/>
             <div className="flex justify-between items-center mb-8">
                 <h2 className="text-3xl font-bold text-indigo-800">Teacher Salary Records</h2>
-                <button
-                    onClick={handleBackToCalculator}
-                    className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition duration-200"
-                >
-                    Back to Calculator
-                </button>
+                <div className="flex space-x-4">
+                    <button
+                        onClick={generateCSV}
+                        className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition duration-200"
+                    >
+                        Download Salary Report
+                    </button>
+                    <button
+                        onClick={handleBackToCalculator}
+                        className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition duration-200"
+                    >
+                        Back to Calculator
+                    </button>
+                </div>
             </div>
 
             <div className="grid grid-cols-1 gap-6">
@@ -98,8 +185,11 @@ const SalaryRecords = () => {
                                             name="teacherName"
                                             value={editForm.teacherName}
                                             onChange={handleInputChange}
-                                            className="w-full px-3 py-2 border rounded-lg"
+                                            className={`w-full px-3 py-2 border ${nameError ? 'border-red-500' : 'border-gray-300'} rounded-lg`}
                                         />
+                                        {nameError && (
+                                            <p className="mt-1 text-sm text-red-600">{nameError}</p>
+                                        )}
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700">Teaching Subject</label>
@@ -108,8 +198,11 @@ const SalaryRecords = () => {
                                             name="teachingSubject"
                                             value={editForm.teachingSubject}
                                             onChange={handleInputChange}
-                                            className="w-full px-3 py-2 border rounded-lg"
+                                            className={`w-full px-3 py-2 border ${subjectError ? 'border-red-500' : 'border-gray-300'} rounded-lg`}
                                         />
+                                        {subjectError && (
+                                            <p className="mt-1 text-sm text-red-600">{subjectError}</p>
+                                        )}
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700">Teaching Year</label>
@@ -124,12 +217,15 @@ const SalaryRecords = () => {
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700">Total Amount</label>
                                         <input
-                                            type="number"
+                                            type="text"
                                             name="totalAmount"
                                             value={editForm.totalAmount}
                                             onChange={handleInputChange}
-                                            className="w-full px-3 py-2 border rounded-lg"
+                                            className={`w-full px-3 py-2 border ${amountError ? 'border-red-500' : 'border-gray-300'} rounded-lg`}
                                         />
+                                        {amountError && (
+                                            <p className="mt-1 text-sm text-red-600">{amountError}</p>
+                                        )}
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700">Institute Cut (%)</label>
@@ -137,6 +233,32 @@ const SalaryRecords = () => {
                                             type="number"
                                             name="instituteCut"
                                             value={editForm.instituteCut}
+                                            onChange={handleInputChange}
+                                            className="w-full px-3 py-2 border rounded-lg"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700">Bank Name</label>
+                                        <select
+                                            name="bankName"
+                                            value={editForm.bankName}
+                                            onChange={handleInputChange}
+                                            className="w-full px-3 py-2 border rounded-lg"
+                                        >
+                                            <option value="">Select a bank</option>
+                                            <option value="Bank of Ceylon">Bank of Ceylon</option>
+                                            <option value="Sampath Bank">Sampath Bank</option>
+                                            <option value="Commercial Bank">Commercial Bank</option>
+                                            <option value="HNB">HNB</option>
+                                            <option value="Peoples Bank">Peoples Bank</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700">Account Number</label>
+                                        <input
+                                            type="text"
+                                            name="accountNumber"
+                                            value={editForm.accountNumber}
                                             onChange={handleInputChange}
                                             className="w-full px-3 py-2 border rounded-lg"
                                         />
@@ -173,6 +295,10 @@ const SalaryRecords = () => {
                                         <p className="text-xl font-bold text-green-600">
                                             Final: LKR {salary.calculatedSalary.toFixed(2)}
                                         </p>
+                                    </div>
+                                    <div>
+                                        <p className="text-gray-600">Bank: {salary.bankName}</p>
+                                        <p className="text-gray-600">Account: {salary.accountNumber}</p>
                                     </div>
                                 </div>
                                 <div className="flex justify-end space-x-4">

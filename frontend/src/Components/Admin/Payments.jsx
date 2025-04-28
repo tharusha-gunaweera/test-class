@@ -4,6 +4,7 @@ import axios from 'axios'
 
 function Payments() {
   const [payments, setPayments] = useState([])
+  const [deletedPayments, setDeletedPayments] = useState([])
   const [editingPayment, setEditingPayment] = useState(null)
   const [editForm, setEditForm] = useState({
     studentName: '',
@@ -30,7 +31,9 @@ function Payments() {
 
   const handleDelete = async (id) => {
     try {
+      const paymentToDelete = payments.find(payment => payment._id === id);
       await axios.delete(`http://localhost:5000/payments/${id}`)
+      setDeletedPayments(prev => [...prev, { ...paymentToDelete, deletedAt: new Date().toISOString() }]);
       fetchPayments() // Refresh the list
     } catch (error) {
       console.error('Error deleting payment:', error)
@@ -68,12 +71,38 @@ function Payments() {
     }
   }
 
+  const generateCSV = () => {
+    if (deletedPayments.length === 0) {
+      alert("No deleted payment records to generate a report.");
+      return;
+    }
+
+    try {
+      const headers = "Student Name,Student ID,Year,Course,Month,Amount,Deleted Date\n";
+      const rows = deletedPayments.map(payment =>
+        `${payment.studentName},${payment.studentId},${payment.studyingYear},${payment.courseName},${payment.paymentMonth},LKR.${payment.amount},${new Date(payment.deletedAt).toLocaleString()}`
+      ).join("\n");
+
+      const csvContent = `data:text/csv;charset=utf-8,${headers}${rows}`;
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "deleted_payment_records_report.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      alert("Error generating CSV file.");
+      console.error(error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-100">
       <Navbar />
       <div className="pl-72 w-full max-w-full px-4 py-8 overflow-x-auto">
         <h1 className="text-3xl font-bold mb-8 text-indigo-800">Student Payments Management</h1>
-        <div className="mb-6">
+        <div className="mb-6 flex items-center gap-4">
           <input
             type="text"
             placeholder="Search by student name..."
@@ -81,6 +110,12 @@ function Payments() {
             onChange={e => setSearch(e.target.value)}
             className="w-full max-w-xs px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
+          <button
+            onClick={generateCSV}
+            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+          >
+            Export Deleted Records
+          </button>
         </div>
         <div className="bg-white rounded-lg shadow overflow-hidden">
           <table className="min-w-full divide-y divide-gray-200 ">

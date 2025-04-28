@@ -14,7 +14,7 @@ function Test() {
     if (userData) {
       try {
         const parsedUser = JSON.parse(userData);
-        console.log("Parsed user data:", parsedUser);
+       
         setUser(parsedUser);
       } catch (error) {
         console.error("Error parsing user data:", error);

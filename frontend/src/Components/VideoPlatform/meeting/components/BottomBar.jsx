@@ -371,7 +371,7 @@ const WebCamBTN = () => {
   );
 };
 
-export function BottomBar({ bottomBarHeight, setIsMeetingLeft }) {
+export function BottomBar({ setIsMeetingLeft }) {
   const { sideBarMode, setSideBarMode } = useMeetingAppContext();
 
   const [user, setUser] = useState(null);

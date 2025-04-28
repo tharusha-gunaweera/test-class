@@ -13,6 +13,7 @@ const SideBarTabView = ({
   height,
   sideBarContainerWidth,
   panelHeight,
+  classId,
   panelHeaderHeight,
   panelHeaderPadding,
   panelPadding,
@@ -73,7 +74,7 @@ const SideBarTabView = ({
             {sideBarMode === "PARTICIPANTS" ? (
               <ParticipantPanel panelHeight={panelHeight} />
             ) : sideBarMode === "CHAT" ? (
-              <ChatPanel panelHeight={panelHeight} />
+              <ChatPanel panelHeight={panelHeight} classId={classId} />
             ) : null}
           </>
         </div>
@@ -82,7 +83,8 @@ const SideBarTabView = ({
   );
 };
 
-export function SidebarConatiner({ height, sideBarContainerWidth }) {
+export function SidebarConatiner({ height, sideBarContainerWidth,classId }) {
+  
   const { raisedHandsParticipants, sideBarMode, setSideBarMode } =
     useMeetingAppContext();
   const isMobile = useIsMobile();
@@ -153,6 +155,7 @@ export function SidebarConatiner({ height, sideBarContainerWidth }) {
                 <Dialog.Panel className="w-screen transform overflow-hidden bg-gray-800 shadow-xl transition-all">
                   <SideBarTabView
                     height={"100%"}
+                    classId={classId}
                     sideBarContainerWidth={"100%"}
                     panelHeight={height}
                     raisedHandsParticipants={raisedHandsParticipants}

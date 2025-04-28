@@ -7,6 +7,7 @@ const userRouter = require('./Routes/UserRoutes');
 const MaterialRoutes = require('./Routes/materialRoutes');
 const paymentRouter = require('./Routes/PaymentRoutes');
 const Adverticement = require('./Routes/AdverticeRout');
+const ProgressRouter = require('./Routes/ProgressRouter');
 const salaryRouter = require('./Routes/SalaryRoutes');
 
 const app = express();
@@ -20,6 +21,7 @@ app.use("/Users",userRouter);
 app.use("/payments",paymentRouter);
 app.use("/MaterialRoutes", MaterialRoutes);
 app.use("/Adverticement", Adverticement);
+app.use("/ProgressRouter", ProgressRouter);
 app.use("/api/salary", salaryRouter);
 
 const mongoURL = process.env.MONGO_URI;

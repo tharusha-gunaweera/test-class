@@ -33,6 +33,8 @@ function App() {
     const isMeetingCreater = searchParams.get("isMeetingCreater");
     const classID = searchParams.get("meetingId");
 
+    
+
     console.log("The value is:",isMeetingCreater);
     if (isMeetingCreater) {
       setisMeetingCreater(isMeetingCreater);
@@ -110,6 +112,7 @@ function App() {
           joinWithoutUserInteraction={true}
         >
           <MeetingContainer
+            classId={classId}
             onMeetingLeave={() => {
               setToken("");
               setMeetingId("");

@@ -11,6 +11,7 @@ import TeacherNav from "./Components/Teacher/Navbar";
 import McqSection from "./Components/Teacher/McqSection";
 import AdminDashboard from "./Components/Admin/AdminDashboard";
 import AdminManageUsers from "./Components/Admin/AdminStudentPanel";
+import AdminProgressCheck from "./Components/Admin/AdminProgressCheck";
 import Test from "./Components/Students/test"
 import TestTeacher from "./Components/Teacher/UpcommingClasses"
 // import TeacherDashboard from "./Components/Teacher/TeacherDashBoard";
@@ -62,11 +63,13 @@ function App() {
             <Route path="/MetirialManage" element={<MetirialManage />} />
 
             <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/AdminManageUsers" element={<AdminManageUsers />} />
+            <Route path="/AdminProgressCheck" element={<AdminProgressCheck />} />
             <Route path="/admin/classes" element={<AdminDashboard />} />
             <Route path="/SalaryForm" element={<SalaryForm />} />
             <Route path="/salary-records" element={<SalaryRecords />} />
             <Route path="/Payments" element={<Payments />} />
+            <Route path="/Payments/AdminProgressCheck" element={<AdminProgressCheck />} />
+            <Route path="/AdminManageUsers" element={<AdminManageUsers />} />
             <Route path="/admin/settings" element={<AdminDashboard />} />
           </Routes>
         </div>

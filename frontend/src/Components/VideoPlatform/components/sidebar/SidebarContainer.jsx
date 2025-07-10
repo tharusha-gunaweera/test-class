@@ -16,6 +16,7 @@ const SideBarTabView = ({
   classId,
   panelHeaderHeight,
   panelHeaderPadding,
+  isCreater,
   panelPadding,
   handleClose,
 }) => {
@@ -74,7 +75,7 @@ const SideBarTabView = ({
             {sideBarMode === "PARTICIPANTS" ? (
               <ParticipantPanel panelHeight={panelHeight} />
             ) : sideBarMode === "CHAT" ? (
-              <ChatPanel panelHeight={panelHeight} classId={classId} />
+              <ChatPanel panelHeight={panelHeight} classId={classId} isCreater={isCreater}  />
             ) : null}
           </>
         </div>
@@ -83,7 +84,7 @@ const SideBarTabView = ({
   );
 };
 
-export function SidebarConatiner({ height, sideBarContainerWidth,classId }) {
+export function SidebarConatiner({ height, sideBarContainerWidth,classId,isCreater }) {
   
   const { raisedHandsParticipants, sideBarMode, setSideBarMode } =
     useMeetingAppContext();
@@ -162,6 +163,7 @@ export function SidebarConatiner({ height, sideBarContainerWidth,classId }) {
                     panelHeaderHeight={panelHeaderHeight}
                     panelHeaderPadding={panelHeaderPadding}
                     panelPadding={panelPadding}
+                    isCreater={isCreater}
                     handleClose={handleClose}
                   />
                 </Dialog.Panel>
@@ -179,6 +181,7 @@ export function SidebarConatiner({ height, sideBarContainerWidth,classId }) {
         panelHeaderHeight={panelHeaderHeight}
         panelHeaderPadding={panelHeaderPadding}
         panelPadding={panelPadding}
+        isCreater={isCreater}
         handleClose={handleClose}
         classId={classId}
       />

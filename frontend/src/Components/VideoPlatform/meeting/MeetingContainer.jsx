@@ -9,7 +9,7 @@ import { useMeetingAppContext } from "../MeetingAppContextDef";
 import { ChatMessages } from "../components/sidebar/ChatPanel";
 import { QuizMessage } from "../components/sidebar/ChatPanel";
 
-export function MeetingContainer({ onMeetingLeave, setIsMeetingLeft,classId }) {
+export function MeetingContainer({ onMeetingLeave, setIsMeetingLeft,classId,isCreater }) {
   const { setSelectedMic, setSelectedWebcam, setSelectedSpeaker } = useMeetingAppContext();
   const [participantsData, setParticipantsData] = useState([]);
   const [isHost, setIsHost] = useState(false);
@@ -64,10 +64,10 @@ export function MeetingContainer({ onMeetingLeave, setIsMeetingLeft,classId }) {
               <div className={`flex flex-1 `}>
                 {mMeeting.presenterId ? <PresenterView /> : <MemorizedParticipantView />}
               </div>
-              <SidebarConatiner classId={classId}/>
+              <SidebarConatiner classId={classId} isCreater={isCreater}/>
             </div>
-            <QuizMessage />
-            <BottomBar setIsMeetingLeft={setIsMeetingLeft}  />
+            <QuizMessage isCreater={isCreater} />
+            <BottomBar classId={classId} setIsMeetingLeft={setIsMeetingLeft} isCreater={isCreater} />
           </>
         ) : (
           <WaitingToJoinScreen />

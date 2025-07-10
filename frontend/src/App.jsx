@@ -35,7 +35,7 @@ function App() {
 
     
 
-    console.log("The value is:",isMeetingCreater);
+    console.log("The value is:",typeof isMeetingCreater);
     if (isMeetingCreater) {
       setisMeetingCreater(isMeetingCreater);
     }
@@ -113,6 +113,7 @@ function App() {
         >
           <MeetingContainer
             classId={classId}
+            isCreater = {isMeetingCreater}
             onMeetingLeave={() => {
               setToken("");
               setMeetingId("");

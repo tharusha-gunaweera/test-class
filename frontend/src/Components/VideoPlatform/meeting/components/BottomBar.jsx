@@ -4,6 +4,7 @@ import {
   usePubSub,
   useMediaDevice,
 } from "@videosdk.live/react-sdk";
+import axios from 'axios';
 import React, { Fragment, useMemo, useRef, useState, useEffect } from "react";
 import {
   ClipboardIcon,
@@ -371,9 +372,9 @@ const WebCamBTN = () => {
   );
 };
 
-export function BottomBar({ setIsMeetingLeft }) {
+export function BottomBar({ setIsMeetingLeft,isCreater,classId }) {
   const { sideBarMode, setSideBarMode } = useMeetingAppContext();
-
+  const { meetingId } = useMeeting();
   const [user, setUser] = useState(null);
     
   useEffect(() => {
@@ -417,14 +418,30 @@ export function BottomBar({ setIsMeetingLeft }) {
     );
   };
 
+  const clearRoom = async (meetingId) => {
+    console.log("Worked untill here toooooo",meetingId);
+    const url = `http://localhost:5000/classes/clear-room/${meetingId}`;
+
+// Make the PUT request
+      axios.put(url)
+        .then(response => {
+          console.log('Success:', response.data);
+        })
+        .catch(error => {      
+          console.error('Error:', error.response ? error.response.data : error.message);
+        });
+      };
+
   const LeaveBTN = () => {
     const { leave, end } = useMeeting();
 
-    const handleLeave = () => {
+    const handleLeave = (meetingId) => {
       // Check if user is a teacher (accLevel 2) or admin (accLevel 3)
       const canEndMeeting = user && (user.acclevel === 2 || user.acclevel === 3);
       
       if (canEndMeeting) {
+        clearRoom(meetingId);
+        console.log("Worked untill here");
         end();
       }
       leave();
@@ -435,13 +452,13 @@ export function BottomBar({ setIsMeetingLeft }) {
       <OutlinedButton
         Icon={EndIcon}
         bgColor="bg-red-150"
-        onClick={handleLeave}
+        onClick={() => handleLeave(meetingId)}
         tooltip={user && (user.acclevel === 2 || user.acclevel === 3) ? "End Meeting" : "Leave Meeting"}
       />
     );
   };
 
-  const ChatBTN = () => {
+  const ChatBTN = (isCreater) => {
     return (
       <OutlinedButton
         Icon={ChatIcon}
@@ -484,6 +501,7 @@ export function BottomBar({ setIsMeetingLeft }) {
             className="ml-2"
             onClick={() => {
               navigator.clipboard.writeText(meetingId);
+              console.log("Is this the meetingid: ",meetingId);
               setIsCopied(true);
               setTimeout(() => {
                 setIsCopied(false);
@@ -528,7 +546,7 @@ export function BottomBar({ setIsMeetingLeft }) {
 
       </div>
       <div className="flex items-center justify-center">
-        <ChatBTN />
+        <ChatBTN isCreater={isCreater}/>
         <ParticipantsBTN />
         
       </div>

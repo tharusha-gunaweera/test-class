@@ -179,11 +179,14 @@ const QuizToast = ({ closeToast, question, answers, correctAnswer, senderName })
   );
 };
 
-const Notification = () => {
+const Notification = ({isCreater}) => {
   const { messages: quizMessages } = usePubSub("QUIZ");
 
   useEffect(() => {
-    if (quizMessages && quizMessages.length > 0) {
+    console.log("is creator is",isCreater)
+    // Convert string to boolean if needed
+    const isCreator = isCreater === false || isCreater === "false";
+    if (isCreator && quizMessages && quizMessages.length > 0) {
       const latestQuiz = quizMessages[quizMessages.length - 1];
       if (latestQuiz && typeof latestQuiz.message === 'object' && latestQuiz.message.type === 'quiz') {
         const { question, answers, correctAnswer } = latestQuiz.message;

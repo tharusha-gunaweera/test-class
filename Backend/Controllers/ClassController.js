@@ -1,3 +1,4 @@
+
 const Class = require('../Model/ClassModel');
 
 // Get all classes
@@ -93,3 +94,33 @@ exports.deleteClass = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 }; 
+
+exports.getClassByRoom = async (req, res) => {
+    try {
+        const classData = await Class.find({ room: req.params.room });
+        console.log("The room is",classData);
+        if (classData.length > 0) {
+            res.json(classData);
+        } else {
+            res.status(404).json({ message: 'No class found for this room' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+
+exports.clearRoomByValue = async (req, res) => {
+    const roomValue = req.params.room;
+    console.log("Room to clear:", roomValue);
+    try {
+        const result = await Class.updateMany(
+            { room: roomValue },
+            { room: null }
+        );
+        console.log("The result is", result);
+        res.json({ message: 'Rooms cleared', modified: result.modifiedCount });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};

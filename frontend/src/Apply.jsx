@@ -13,7 +13,7 @@ import AdminDashboard from "./Components/Admin/AdminDashboard";
 import AdminManageUsers from "./Components/Admin/AdminStudentPanel";
 import AdminTeacherPanel from "./Components/Admin/AdminTeacherPanel";
 import AdminProfile from "./Components/Admin/AdminProfile";
-import AdminProgressCheck from "./Components/Admin/AdminProgressCheck";
+import AdminProgressCheck from "./Components/Teacher/AdminProgressCheck";
 import Test from "./Components/Students/test"
 import TestTeacher from "./Components/Teacher/UpcommingClasses"
 import TeachersTimeTable from "./Components/Students/scheduler";
@@ -27,7 +27,7 @@ import SalaryForm from "./Components/Admin/SalaryForm";
 import SalaryRecords from "./Components/Admin/SalaryRecords";
 import Payments from './Components/Admin/Payments';
 
-registerLicense("Ngo9BigBOggjHTQxAR8/V1NNaF5cXmpCe0x0R3xbf1x1ZFRMZF1bRHVPIiBoS35Rc0VnW3tec3BTQ2ZbWE10VEBU");
+registerLicense("Ngo9BigBOggjHTQxAR8/V1JEaF5cXmRCdkxzWmFZfVtgdVdMZFhbRnNPMyBoS35Rc0VkWXdecHBQRmBaVUR2VEFd");
 
 function App() {
   return (

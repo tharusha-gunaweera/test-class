@@ -40,9 +40,7 @@ export function MeetingDetailsScreen({
               const result = await _handleOnCreateMeeting();
               console.log("Meeting creation result:", result);
               const { meetingId, err } = result;
-              console.log("Meeting Id is: ", meetingId);
-              console.log("Class Id is: ", classId);
-              console.log("Error if any: ", err);
+              
 
               setMeetingId(meetingId);
               setIsMeetingCreated(true);
@@ -54,12 +52,12 @@ export function MeetingDetailsScreen({
                 console.log("Current class data:", currentClass);
 
                 // Update the class with the new meeting ID while preserving other fields
-                console.log("Updating class with meeting ID:", meetingId);
+               
                 const response = await axios.put(`http://localhost:5000/Classes/${classId}`, {
                   teacherID: currentClass.teacherID,
                   teacherName: currentClass.teacherName,
                   className: currentClass.className,
-                  subject: currentClass.subject,
+                  subject: currentClass.subject, 
                   schedule: currentClass.schedule,
                   duration: currentClass.duration,
                   room: meetingId,

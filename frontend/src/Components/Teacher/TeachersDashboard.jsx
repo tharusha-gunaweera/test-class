@@ -137,7 +137,7 @@ const TeacherDashboard = () => {
                 </div>
                 <div className="divide-y divide-gray-200">
                   {classes.map(cls => (
-                    <div key={cls.id} className="p-6 hover:bg-gray-50 transition-colors">
+                    <div key={cls.id} className="p-6 hover:bg-blue-100 transition-colors">
                       <div className="flex justify-between items-center">
                         <div>
                           <h3 className="font-medium text-gray-900">{cls.name}</h3>
@@ -179,7 +179,7 @@ const TeacherDashboard = () => {
                 </div>
                 <div className="divide-y divide-gray-200">
                   {announcements.map(announcement => (
-                    <div key={announcement.id} className="p-3 hover:bg-gray-50 transition-colors">
+                    <div key={announcement.id} className="p-3 hover:bg-blue-100 transition-colors">
                       <div className="flex space-x-4">
                         <div className="flex-shrink-0">
                           <div className="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-medium">

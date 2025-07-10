@@ -128,7 +128,7 @@ const MyClasses = () => {
                     className={`p-3 rounded-lg cursor-pointer transition ${
                       selectedClass?._id === cls._id
                         ? 'bg-blue-50 border border-blue-200'
-                        : 'hover:bg-gray-50 border border-gray-200'
+                        : 'hover:bg-blue-100 border border-gray-200'
                     }`}
                   >
                     <div className="flex items-start justify-between">

@@ -68,8 +68,9 @@ const ChatMessage = ({ senderId, senderName, message, timestamp }) => {
 
 
 
-const ChatInput = ({ classId }) => {
+const ChatInput = ({ classId,isCreater }) => {
   console.log("ChatInput received classId:", classId);
+  console.log("ChatInput received creater:", typeof isCreater);
   const [message, setMessage] = useState("");
   const [question, setQuestion] = useState("");
   const [answers, setAnswers] = useState(["", "", "", ""]);
@@ -79,6 +80,9 @@ const ChatInput = ({ classId }) => {
   const { publish: publishQuiz } = usePubSub("QUIZ");
   
   const input = useRef();
+
+  // console.log("Iscreater in chat pannel",isCreater);
+  // console.log("Iscreater in chat pannel type",typeof isCreater);
 
   const handleAnswerChange = (index, value) => {
     const newAnswers = [...answers];
@@ -178,12 +182,14 @@ const ChatInput = ({ classId }) => {
             />
           </button>
         </div>
-        <button
-          className="bg-blue-500 hover:bg-blue-700 text-white py-1 px-3 rounded text-sm w-full mt-2"
-          onClick={fetchRandomMCQ}
-        >
-          Create Quiz Question
-        </button>
+        {isCreater === "true" && (
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-white py-1 px-3 rounded text-sm w-full mt-2"
+              onClick={fetchRandomMCQ}
+            >
+              Create Quiz Question
+            </button>
+        )}
       </div>
     </div>
   );
@@ -238,7 +244,7 @@ export const ChatMessages = ({ listHeight }) => {
 };
 
 
-export const QuizMessage = ({ listHeight }) => {
+export const QuizMessage = ({ listHeight,isCreater }) => {
   const listRef = useRef();
   const { messages: quizMessages } = usePubSub("QUIZ");
 
@@ -247,6 +253,7 @@ export const QuizMessage = ({ listHeight }) => {
   return  (
     <>
     <Notification 
+        isCreater={isCreater}
         senderId={quizMessages.senderId}
         senderName={quizMessages.senderName}
         text={quizMessages.message}
@@ -256,8 +263,9 @@ export const QuizMessage = ({ listHeight }) => {
   ) 
 };
 
-export function ChatPanel({ panelHeight, classId }) {
+export function ChatPanel({ panelHeight, classId ,isCreater}) {
   console.log("ChatPanel received classId:", classId);
+  
   const inputHeight = 600;
   const listHeight = panelHeight - inputHeight;
 
@@ -269,7 +277,7 @@ export function ChatPanel({ panelHeight, classId }) {
         <ChatMessages listHeight={listHeight} />
       </div>
       <div className="sticky bottom-0 bg-gray-800 p-2">
-        <ChatInput classId={classId} />
+        <ChatInput classId={classId} isCreater={isCreater}/>
       </div>
     </div>
   );

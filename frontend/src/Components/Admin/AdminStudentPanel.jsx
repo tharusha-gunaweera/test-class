@@ -140,7 +140,7 @@ const AdminStudentPanel = () => {
   return (
     <div className="min-h-screen bg-sky-100 p-6">
       <Navbar />
-      <div className="ml-[260px] max-w-6xl mx-auto">
+      <div className="ml-[260px] max-w-8xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <div className="flex items-center">
             <FaUserGraduate className="text-blue-600 text-3xl mr-3" />

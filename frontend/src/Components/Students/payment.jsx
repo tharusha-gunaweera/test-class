@@ -382,7 +382,7 @@ function AddPayment() {
                   </div>
                 ) : (
                   classes.map((cls) => (
-                    <div key={cls._id} className="p-4 hover:bg-gray-300 cursor-pointer transition-colors duration-150">
+                    <div key={cls._id} className="p-4 hover:bg-blue-100 cursor-pointer transition-colors duration-150">
                       <div className="flex justify-between">
                         <h3 className="text-sm font-medium text-gray-900">{cls.className}</h3>
                         <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
